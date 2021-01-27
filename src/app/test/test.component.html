@@ -1,0 +1,20 @@
+<div style="text-align:center;margin-top: 200px;">
+  <button (click)="initiateRecording()" class="btn btn-primary" *ngIf="!recording"
+          style="cursor: pointer;background-color: green;color: white;font-size: 40px;"> Start Recording
+  </button>
+  <button (click)="stopRecording()" class="btn btn-danger" *ngIf="recording"
+          style="cursor: pointer;background-color: red;color: white;font-size: 40px;"> Stop Recording
+  </button>
+  <!--  <audio controls="" *ngIf="url" autoplay>-->
+  <!--    <source [src]="sanitize(url)" type="audio/wav">-->
+  <!--  </audio>-->
+  <video #myVid controls="" *ngIf="url" width="400">
+    <source [src]="sanitize(url)" type='video/webm; codecs="opus,vp8"'>
+    Your browser does not support HTML5 video.
+  </video>
+
+  <video #myVid2 width="400" autoplay>
+    <source type='video/webm; codecs="opus,vp8"'>
+    Your browser does not support HTML5 video.
+  </video>
+</div>

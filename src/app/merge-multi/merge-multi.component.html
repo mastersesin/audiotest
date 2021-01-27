@@ -1,0 +1,17 @@
+<video #streamView width="400" autoplay>
+  <source type='video/webm; codecs="opus,vp8"'>
+  Your browser does not support HTML5 video.
+</video>
+
+<ng-template [ngIf]="toggle">
+  <div *ngFor="let obj of this.peerConnList">
+    {{obj.remote_user}}
+    <video width="400" [srcObject]="obj.remoteStream" autoplay>
+    </video>
+  </div>
+</ng-template>
+
+<button (click)="initIdentity('Ty1')">Ty1</button>
+<button (click)="initIdentity('Ty2')">Ty2</button>
+<button (click)="initIdentity('Ty3')">Ty3</button>
+<button (click)="check()">check</button>
