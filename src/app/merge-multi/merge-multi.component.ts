@@ -1,6 +1,10 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, HostListener, OnInit, ViewChild} from '@angular/core';
 import {Socket} from 'ngx-socket-io';
 import {IceResponse} from '../merge/merge.component';
+
+export interface RoomObject {
+  [key: string]: string[];
+}
 
 @Component({
   selector: 'app-merge-multi',
@@ -13,7 +17,7 @@ export class MergeMultiComponent implements OnInit {
   @ViewChild('theirStreamView') theirStreamView: ElementRef;
 
   // Get user media constraint
-  constraints = {video: true, audio: false};
+  constraints = {video: false, audio: true};
   remoteStream = new MediaStream();
   isAddRemoteStream = false;
   identity = null;
@@ -21,6 +25,8 @@ export class MergeMultiComponent implements OnInit {
   isSentIceCandidate = false;
   peerConnList = [];
   toggle = false;
+  roomList = [];
+  currentRoomName = null;
 
   configuration = {
     iceServers: [
@@ -38,39 +44,63 @@ export class MergeMultiComponent implements OnInit {
   }
 
   ngOnInit(): void {
-
-  }
-
-  async onCreateAnswerNeeded(rtcPeerConn: RTCPeerConnection): Promise<any> {
-    const answer = await rtcPeerConn.createAnswer();
-    await rtcPeerConn.setLocalDescription(answer);
-    return answer;
-  }
-
-  onAnswerReceive(rtcPeerConn: RTCPeerConnection, answer): void {
-    console.log('Start processing answer');
-    const sessionDesc = new RTCSessionDescription(answer);
-    rtcPeerConn.setRemoteDescription(sessionDesc);
-    console.log('setRemoteDesc done');
-  }
-
-  initIdentity(identity): void {
-    this.identity = identity;
-
+    this.socket.on('icecandidatechannel', (response) => {
+      console.log(response);
+      if (response.send_to === this.identity) {
+        console.log('Received ice candidate');
+        this.peerConnList.forEach(peerObj => {
+          if (peerObj.remote_user === response.send_from) {
+            const rtcPeerConn = peerObj.peerObj;
+            rtcPeerConn.addIceCandidate(new RTCIceCandidate(response.candidate));
+          }
+        });
+      }
+    });
+    this.socket.on('listallroom1', (response: RoomObject[]) => {
+      console.log(response);
+      this.roomList = [];
+      response.forEach(room => {
+        const key = Object.keys(room)[0];
+        const values = Object.keys(room).map(key1 => room[key1]);
+        this.roomList.push({
+          room_name: key,
+          peer: values[0],
+          status: 'disconnect'
+        });
+      });
+    });
     this.socket.on('room', (response) => {
       if (response.command === 'info' && response.args) {
-        console.log(response);
+        console.log(this.roomList);
         response.args.forEach((userIdentity) => {
-          if (userIdentity !== this.identity) {
+          let isMessageComeFromUserInCurrentRoom = false;
+          let isAlreadyHavePeerConn = false;
+          this.roomList.forEach(room => {
+            if (
+              room.room_name === this.currentRoomName &&
+              room.peer.includes(userIdentity)) {
+              isMessageComeFromUserInCurrentRoom = true;
+            }
+          });
+          this.peerConnList.forEach((conn) => {
+            if (conn.remote_user === userIdentity) {
+              isAlreadyHavePeerConn = true;
+            }
+          });
+          if (userIdentity !== this.identity && isMessageComeFromUserInCurrentRoom && !isAlreadyHavePeerConn) {
             const rtcPeerConn = new RTCPeerConnection(this.configuration);
             this.peerConnList.push({peerObj: rtcPeerConn, remote_user: userIdentity});
             this.initMandatoryEventListener(rtcPeerConn, userIdentity, false);
+            const localStream = new MediaStream();
             this.initWebRTCDependencies(rtcPeerConn).then(stream => {
               stream.getTracks().forEach(track => {
                 console.log('Track add');
                 rtcPeerConn.addTrack(track, stream);
+                if (track.kind === 'video') {
+                  localStream.addTrack(track);
+                }
               });
-              this.streamView.nativeElement.srcObject = stream;
+              this.streamView.nativeElement.srcObject = localStream;
               console.log('End getting stream');
               console.log('negotiationneeded should trigger now');
             });
@@ -84,31 +114,35 @@ export class MergeMultiComponent implements OnInit {
         console.log('Receive an offer');
         console.log(response);
         const rtcPeerConnAnswer = new RTCPeerConnection(this.configuration);
-        rtcPeerConnAnswer.createOffer().then(a => {
-          this.peerConnList.push({peerObj: rtcPeerConnAnswer, remote_user: response.args.from_user});
-          this.initMandatoryEventListener(rtcPeerConnAnswer, response.args.from_user, true);
-          this.initWebRTCDependencies(rtcPeerConnAnswer).then(stream => {
-            stream.getTracks().forEach(track => {
-              console.log('Track add');
-              rtcPeerConnAnswer.addTrack(track, stream);
-            });
-            this.streamView.nativeElement.srcObject = stream;
-            console.log('End getting stream');
-            console.log('negotiationneeded should trigger now');
+        const localStream = new MediaStream();
+        this.initWebRTCDependencies(rtcPeerConnAnswer).then(stream => {
+          stream.getTracks().forEach(track => {
+            console.log('Track add');
+            rtcPeerConnAnswer.addTrack(track, stream);
+            if (track.kind === 'video') {
+              localStream.addTrack(track);
+            }
           });
-          rtcPeerConnAnswer.setRemoteDescription(new RTCSessionDescription(response.args.message)).then(_ => {
-            this.onCreateAnswerNeeded(rtcPeerConnAnswer).then((answer) => {
-              console.log('Send answer');
-              this.socket.emit('room', {
-                command: 'connectmessage',
-                args: {
-                  to_user: response.args.from_user,
-                  from_user: this.identity,
-                  message: answer
-                }
+          this.streamView.nativeElement.srcObject = localStream;
+          rtcPeerConnAnswer.createOffer().then(a => {
+            this.peerConnList.push({peerObj: rtcPeerConnAnswer, remote_user: response.args.from_user});
+            this.initMandatoryEventListener(rtcPeerConnAnswer, response.args.from_user, true);
+            rtcPeerConnAnswer.setRemoteDescription(new RTCSessionDescription(response.args.message)).then(_ => {
+              this.onCreateAnswerNeeded(rtcPeerConnAnswer).then((answer) => {
+                console.log('Send answer');
+                this.socket.emit('room', {
+                  command: 'connectmessage',
+                  args: {
+                    to_user: response.args.from_user,
+                    from_user: this.identity,
+                    message: answer
+                  }
+                });
               });
             });
           });
+          console.log('End getting stream');
+          console.log('negotiationneeded should trigger now');
         });
       } else if (
         response.command === 'connectmessage' &&
@@ -125,35 +159,72 @@ export class MergeMultiComponent implements OnInit {
           }
         });
       }
-      this.socket.emit('room', {
-        command: 'join',
-        args: {
-          user_identity: this.identity,
-          room_name: 'default'
-        }
-      });
     });
+  }
+
+
+  @HostListener('window:beforeunload', ['$event'])
+  unloadHandler(event: Event): any {
+    // Your logic on beforeunload
+    console.log(event);
+    this.socket.emit('leave', {user_identity: this.identity, current_room: this.currentRoomName});
+  }
+
+  async onCreateAnswerNeeded(rtcPeerConn: RTCPeerConnection): Promise<any> {
+    const answer = await rtcPeerConn.createAnswer();
+    await rtcPeerConn.setLocalDescription(answer);
+    return answer;
+  }
+
+  onAnswerReceive(rtcPeerConn: RTCPeerConnection, answer): void {
+    console.log('Start processing answer');
+    const sessionDesc = new RTCSessionDescription(answer);
+    rtcPeerConn.setRemoteDescription(sessionDesc);
+    console.log('setRemoteDesc done');
+  }
+
+  test(): any {
+    navigator.mediaDevices.getUserMedia({audio: true});
+  }
+
+  joinAudioRoom(roomName, currentRoomName): void {
+
+    // this.peerConnList.forEach(conn => {
+    //   conn.remoteStream = null;
+    // });
+    this.peerConnList = [];
 
     this.socket.emit('room', {
-      command: 'checkroom',
+      command: 'join',
       args: {
-        room_name: 'default'
+        user_identity: this.identity,
+        room_name: roomName,
+        current_room_name: currentRoomName
       }
     });
+    this.currentRoomName = roomName;
+
+    console.log(this.currentRoomName);
+
+    // this.socket.emit('room', {
+    //   command: 'checkroom',
+    //   args: {
+    //     room_name: 'default'
+    //   }
+    // });
 
     // And when we receiving ice candidate from remote when setup last piece
-    this.socket.on('icecandidatechannel', (response) => {
-      console.log(response);
-      if (response.send_to === this.identity) {
-        console.log('Received ice candidate');
-        this.peerConnList.forEach(peerObj => {
-          if (peerObj.remote_user === response.send_from) {
-            const rtcPeerConn = peerObj.peerObj;
-            rtcPeerConn.addIceCandidate(new RTCIceCandidate(response.candidate));
-          }
-        });
+  }
+
+  initIdentity(identity): void {
+    this.identity = identity;
+    this.currentRoomName = identity;
+    this.socket.emit('createnewroom',
+      {
+        user_identity: this.identity,
+        room_name: this.identity
       }
-    });
+    );
   }
 
   initWebRTCDependencies(rtcPeerConn: RTCPeerConnection): Promise<any> {
@@ -167,6 +238,7 @@ export class MergeMultiComponent implements OnInit {
       rtcPeerConn.addEventListener('negotiationneeded', event => {
         // Start create sdp offer type
         console.log('negotiationneeded triggered');
+        console.log(userIdentity);
         this.onCreateOfferNeeded(rtcPeerConn).then(offer => {
           console.log('Offer created ... now starting setLocalDescription');
           rtcPeerConn.setLocalDescription(offer).then(value => {
@@ -196,6 +268,7 @@ export class MergeMultiComponent implements OnInit {
     });
 
     rtcPeerConn.addEventListener('track', event => {
+      console.log(event);
       const remoteStreamObj = new MediaStream();
       remoteStreamObj.addTrack(event.track);
       this.peerConnList.forEach(peerObj => {
@@ -209,6 +282,11 @@ export class MergeMultiComponent implements OnInit {
       if (rtcPeerConn.connectionState === 'connected') {
         // Peers connected!
         console.log('connected');
+        this.roomList.forEach(room => {
+          if (room.room_name === this.currentRoomName) {
+            room.status = 'connected';
+          }
+        });
       }
     });
   }

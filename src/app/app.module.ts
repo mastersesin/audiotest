@@ -13,7 +13,7 @@ import {AnswerOfferComponent} from './answer-offer/answer-offer.component';
 import {MergeComponent} from './merge/merge.component';
 import { MergeMultiComponent } from './merge-multi/merge-multi.component';
 
-const config: SocketIoConfig = {url: 'http://localhost:5000', options: {}};
+const config: SocketIoConfig = {url: 'https://192.168.0.138:5000', options: {}};
 const routes: Routes = [
   {path: 'offer', component: SendOfferComponent},
   {path: 'answer', component: AnswerOfferComponent},
