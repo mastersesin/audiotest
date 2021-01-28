@@ -31,13 +31,14 @@ export class RoomComponent implements OnInit {
   configuration = {
     iceServers: [
       {
-        urls: [
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-        ],
+        urls: 'turn:34.123.205.86:1609?transport=udp',
+        username: 'Ty1',
+        credential: 'password'
       },
-    ],
-    iceCandidatePoolSize: 10,
+      {
+        urls: 'stun:34.123.205.86:1609',
+      },
+    ]
   };
 
   get selectedRoom() {
