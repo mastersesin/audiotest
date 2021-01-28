@@ -17,7 +17,7 @@ export class RoomService {
   private selectedRoom: IRoom | undefined;
 
   constructor() {
-    this.rooms = [...this.dummyRooms];
+    // this.rooms = [...this.dummyRooms];
   }
 
   private dummyRooms: IRoom[] = [
@@ -78,7 +78,9 @@ export class RoomService {
   }
 
   createNewRoomList(roomList: IRoom[]) {
+    this.rooms = [];
     this.rooms = [...roomList];
+    console.log('this rooms ', this.rooms);
   }
 
   removeAllRooms() {

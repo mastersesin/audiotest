@@ -50,7 +50,7 @@
       'bg-warning': room?.joined === true,
       'joined': room?.joined === true
     }" (click)="onClickOnRoom(room)" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
-    <div class="d-flex w-100 justify-content-between">
+    <div class=" d-flex w-300 justify-content-between">
       <h5 class="mb-1">{{room.name}}</h5>
       <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
         <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
@@ -58,15 +58,11 @@
           {{room.status}}</span>
       </small>
     </div>
-    <p *ngIf="room.peer?.length" class="mb-1">Members: {{room.peer}}</p>
+    <p *ngIf="room.peer?.length" class="mb-1 peer">{{room.peer}}</p>
     <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
     <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
       {{ showRoomTips(room)}}
     </small>
-    <span>
-
-    </span>
-
   </li>
 </ul>
 

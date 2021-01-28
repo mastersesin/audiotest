@@ -14,7 +14,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: environment.backendUrl, options: {} };
+const config: SocketIoConfig = {
+  url: environment.backendUrl, options: {
+    withCredentials: true,
+    extraHeaders: {
+      "Access-Control-Allow-Origin": "*"
+    }
+  },
+};
 
 @NgModule({
   declarations: [

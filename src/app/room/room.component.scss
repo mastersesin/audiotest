@@ -1,5 +1,9 @@
 .rooms {
   .room {
+    .peer {
+      word-break: break-all;
+      font-style: italic;
+    }
     cursor: pointer;
     &:hover {
       background-color: #0c6efd;

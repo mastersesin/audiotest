@@ -26,27 +26,6 @@ export class RoomComponent implements OnInit {
   isSentIceCandidate = false;
   peerConnList: any[] = [];
   toggle = false;
-  get roomList() {
-    return this.getRoomList();
-  }
-  set roomList(value: any) {
-    console.log('set room list');
-    if (value.length) {
-      console.log('start set room list');
-      // this.roomService.createNewRoomList(value.map((r) => {
-      //   const { room_name, peer, status } = r;
-      //   return {
-      //     id: room_name,
-      //     name: room_name,
-      //     peer,
-      //     status,
-      //   } as IRoom;
-      // }));
-      this.roomService.createNewRoomList(value);
-    }
-
-  }
-  // roomList: any[] = [];
   currentRoomName: any = null;
 
   configuration = {
@@ -69,14 +48,16 @@ export class RoomComponent implements OnInit {
     // if (room?.hovered === true && this.selectedRoom?.id !== room?.id) {
     //   return '(Click to join)';
     // }
-    if (this.selectedRoom?.id === room?.id) {
+    if (this.selectedRoom?.id === room?.id || this.selectedRoom?.status === 'connected') {
       return 'Joined!';
     }
-    return 'Click to join...';
+    // return 'Click to join...';
+    return '';
   }
 
   getRoomList() {
-    return this.roomService.getRoomList();
+    const allRooms = this.roomService.getRoomList()
+    return allRooms;
   }
 
   onClickOnRoom(room: IRoom) {
@@ -103,7 +84,6 @@ export class RoomComponent implements OnInit {
   connect() {
     const email = this.authService.getProfile().email;
     this.initIdentity(email);
-
   }
 
   ngOnInit(): void {
@@ -122,7 +102,7 @@ export class RoomComponent implements OnInit {
     });
     this.socket.on('listallroom1', (response: RoomObject[]) => {
       console.log(response);
-      this.roomList = [];
+      this.roomService.removeAllRooms();
       response.forEach(room => {
         const key = Object.keys(room)[0];
         const values = Object.keys(room).map(key1 => room[key1]);
@@ -131,11 +111,6 @@ export class RoomComponent implements OnInit {
           peer: values[0],
           status: 'disconnect'
         } as any;
-        try {
-          this.roomList.push(thisRoom);
-        } catch (error) {
-          console.warn(error);
-        }
         this.roomService.addRoom({
           id: new Date().getTime().toString(),
           name: thisRoom.room_name,
@@ -146,11 +121,10 @@ export class RoomComponent implements OnInit {
     });
     this.socket.on('room', (response: any) => {
       if (response.command === 'info' && response.args) {
-        console.log(this.roomList);
         response.args.forEach((userIdentity: any) => {
           let isMessageComeFromUserInCurrentRoom = false;
           let isAlreadyHavePeerConn = false;
-          this.roomList.forEach((room: IRoom) => {
+          this.roomService.getRoomList().forEach((room: IRoom) => {
             if (
               room.name === this.currentRoomName &&
               room.peer.includes(userIdentity)) {
@@ -357,9 +331,12 @@ export class RoomComponent implements OnInit {
       if (rtcPeerConn.connectionState === 'connected') {
         // Peers connected!
         console.log('connected');
-        this.roomList.forEach((room: IRoom) => {
+        this.roomService.getRoomList().forEach((room: IRoom) => {
           if (room.name === this.currentRoomName) {
-            room.status = 'connected';
+            this.roomService.updateRoom({
+              ...room,
+              status: 'connected'
+            })
           }
         });
       }
