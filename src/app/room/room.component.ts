@@ -26,7 +26,27 @@ export class RoomComponent implements OnInit {
   isSentIceCandidate = false;
   peerConnList: any[] = [];
   toggle = false;
-  roomList: any[] = [];
+  get roomList() {
+    return this.getRoomList();
+  }
+  set roomList(value: any) {
+    console.log('set room list');
+    if (value.length) {
+      console.log('start set room list');
+      // this.roomService.createNewRoomList(value.map((r) => {
+      //   const { room_name, peer, status } = r;
+      //   return {
+      //     id: room_name,
+      //     name: room_name,
+      //     peer,
+      //     status,
+      //   } as IRoom;
+      // }));
+      this.roomService.createNewRoomList(value);
+    }
+
+  }
+  // roomList: any[] = [];
   currentRoomName: any = null;
 
   configuration = {
@@ -111,7 +131,11 @@ export class RoomComponent implements OnInit {
           peer: values[0],
           status: 'disconnect'
         } as any;
-        this.roomList.push(thisRoom);
+        try {
+          this.roomList.push(thisRoom);
+        } catch (error) {
+          console.warn(error);
+        }
         this.roomService.addRoom({
           id: new Date().getTime().toString(),
           name: thisRoom.room_name,
@@ -126,9 +150,9 @@ export class RoomComponent implements OnInit {
         response.args.forEach((userIdentity: any) => {
           let isMessageComeFromUserInCurrentRoom = false;
           let isAlreadyHavePeerConn = false;
-          this.roomList.forEach(room => {
+          this.roomList.forEach((room: IRoom) => {
             if (
-              room.room_name === this.currentRoomName &&
+              room.name === this.currentRoomName &&
               room.peer.includes(userIdentity)) {
               isMessageComeFromUserInCurrentRoom = true;
             }
@@ -333,8 +357,8 @@ export class RoomComponent implements OnInit {
       if (rtcPeerConn.connectionState === 'connected') {
         // Peers connected!
         console.log('connected');
-        this.roomList.forEach(room => {
-          if (room.room_name === this.currentRoomName) {
+        this.roomList.forEach((room: IRoom) => {
+          if (room.name === this.currentRoomName) {
             room.status = 'connected';
           }
         });

@@ -77,6 +77,14 @@ export class RoomService {
     }));
   }
 
+  createNewRoomList(roomList: IRoom[]) {
+    this.rooms = [...roomList];
+  }
+
+  removeAllRooms() {
+    this.rooms = [];
+  }
+
   joinRoom(room: IRoom) {
     this.resetJoined();
     room.joined = true;
