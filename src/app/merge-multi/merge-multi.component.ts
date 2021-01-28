@@ -42,10 +42,13 @@ export class MergeMultiComponent implements OnInit {
   configuration = {
     iceServers: [
       {
-        urls: 'turn:numb.viagenie.ca',
-        username: 'webrtc@live.com',
-        credential: 'muazkh'
-      }
+        urls: 'turn:34.123.205.86:1609?transport=udp',
+        username: 'Ty1',
+        credential: 'password'
+      },
+      {
+        urls: 'stun:34.123.205.86:1609',
+      },
     ]
   };
 
@@ -268,12 +271,14 @@ export class MergeMultiComponent implements OnInit {
 
     rtcPeerConn.addEventListener('icecandidate', event => {
       if (event.candidate) {
-        console.log(event);
-        this.socket.emit('icecandidatechannel', {
-          candidate: event.candidate,
-          send_to: userIdentity,
-          send_from: this.identity
-        });
+        const type = event.candidate.candidate.split(' ')[7];
+        if (type === 'relay') {
+          this.socket.emit('icecandidatechannel', {
+            candidate: event.candidate,
+            send_to: userIdentity,
+            send_from: this.identity
+          });
+        }
       }
     });
 
