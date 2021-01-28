@@ -28,16 +28,25 @@ export class MergeMultiComponent implements OnInit {
   roomList = [];
   currentRoomName = null;
 
+  // configuration = {
+  //   iceServers: [
+  //     {
+  //       urls: [
+  //         'stun:stun1.l.google.com:19302',
+  //         'stun:stun2.l.google.com:19302',
+  //       ],
+  //     },
+  //   ],
+  //   iceCandidatePoolSize: 10,
+  // };
   configuration = {
     iceServers: [
       {
-        urls: [
-          'stun:stun1.l.google.com:19302',
-          'stun:stun2.l.google.com:19302',
-        ],
-      },
-    ],
-    iceCandidatePoolSize: 10,
+        urls: 'turn:numb.viagenie.ca',
+        username: 'webrtc@live.com',
+        credential: 'muazkh'
+      }
+    ]
   };
 
   constructor(private socket: Socket) {
@@ -259,6 +268,7 @@ export class MergeMultiComponent implements OnInit {
 
     rtcPeerConn.addEventListener('icecandidate', event => {
       if (event.candidate) {
+        console.log(event);
         this.socket.emit('icecandidatechannel', {
           candidate: event.candidate,
           send_to: userIdentity,
