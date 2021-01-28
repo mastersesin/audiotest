@@ -17,11 +17,11 @@
 </ng-select> -->
 
 <hr />
-<video #streamView width="40" height="40" autoplay>
+<video id="local-video-container" #streamView width="40" height="40" autoplay>
   <source type='video/webm; codecs="opus,vp8"'>
   Your browser does not support HTML5 video.
 </video>
-<div *ngFor="let obj of this.peerConnList">
+<div id="remote-video-container" *ngFor="let obj of this.peerConnList">
   <video width="40" height="40" [srcObject]="obj.remoteStream" autoplay>
   </video>
 </div>
@@ -41,7 +41,7 @@
 </ul> -->
 <hr />
 <div *ngIf="this.identity">
-  Hello {{this.identity}} !
+  Hello <b>{{this.identity}}</b> !
 </div>
 <hr />
 <ul *ngIf="this.identity" class="rooms list-group">
@@ -51,14 +51,15 @@
       'joined': room?.joined === true
     }" (click)="onClickOnRoom(room)" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
     <div class="d-flex w-100 justify-content-between">
-      <h5 class="mb-1">Name: {{room.name}}</h5>
+      <h5 class="mb-1">{{room.name}}</h5>
       <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
-        <span *ngIf="!room.peer.includes(this.identity)">Status: {{room.status}}</span>
+        <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
         <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
-          Status: {{room.status}}</span>
+          {{room.status}}</span>
       </small>
     </div>
-    <p class="mb-1">Peers: {{room.peer}}</p>
+    <p *ngIf="room.peer?.length" class="mb-1">Members: {{room.peer}}</p>
+    <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
     <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
       {{ showRoomTips(room)}}
     </small>
@@ -69,18 +70,7 @@
   </li>
 </ul>
 
-<!-- <div *ngIf="this.identity">
-  <div *ngFor="let room of roomList">
-    room name: {{room.room_name}} -
-    peers: {{room.peer}} -
-    <button *ngIf="this.identity !== null && !room.peer.includes(this.identity)"
-      (click)="joinAudioRoom(room.room_name, this.currentRoomName)">Join {{room.room_name}}</button>
-    <span *ngIf="!room.peer.includes(this.identity)"> - Connection status: {{room.status}}</span>
-    <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'"> - Connection status:
-      {{room.status}}</span>
-  </div>
-</div> -->
-<div *ngIf="!this.identity">You not specify identity yet</div>
+<div *ngIf="!this.identity"><i>You have not specified your identity yet!</i></div>
 
 <!-- <button (click)="initIdentity('Ty1')">Ty1</button>
 <button (click)="initIdentity('Ty2')">Ty2</button>

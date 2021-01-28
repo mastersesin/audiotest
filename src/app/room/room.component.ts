@@ -64,6 +64,13 @@ export class RoomComponent implements OnInit {
     if (!check) {
       return;
     }
+    const currentRoom = this.roomService.getCurrentRoom();
+    if (currentRoom && currentRoom.joined !== undefined) {
+      if (currentRoom.joined === room.joined === true) {
+        console.log('Already Joined');
+        return;
+      }
+    }
     const joinedRoom = this.roomService.joinRoom(room);
     this.joinAudioRoom(joinedRoom.name, this.currentRoomName);
   }
