@@ -1,0 +1,12 @@
+<video #streamView width="400" autoplay>
+  <source type='video/webm; codecs="opus,vp8"'>
+  Your browser does not support HTML5 video.
+</video>
+
+<video #theirStreamView width="400" autoplay>
+  <source type='video/webm; codecs="opus,vp8"'>
+  Your browser does not support HTML5 video.
+</video>
+<h1 id="PermissionErr"></h1>
+<button (click)="joinRoom('Alice')">Alice</button>
+<button (click)="joinRoom('Bob')">Bob</button>

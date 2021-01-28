@@ -1,0 +1,21 @@
+.rooms {
+  .room {
+    cursor: pointer;
+    &:hover {
+      background-color: #0c6efd;
+      color: white;
+    }
+    &.joined {
+      color: black;
+    }
+    .sub-text {
+      color: #6c757d;
+      &.hovered {
+        color: whitesmoke;
+      }
+      &.joined {
+        color: black;
+      }
+    }
+  }
+}
