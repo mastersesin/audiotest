@@ -309,11 +309,14 @@ export class RoomComponent implements OnInit {
 
     rtcPeerConn.addEventListener('icecandidate', event => {
       if (event.candidate) {
-        this.socket.emit('icecandidatechannel', {
-          candidate: event.candidate,
-          send_to: userIdentity,
-          send_from: this.identity
-        });
+        const type = event.candidate.candidate.split(' ')[7];
+        if (type === 'relay') {
+          this.socket.emit('icecandidatechannel', {
+            candidate: event.candidate,
+            send_to: userIdentity,
+            send_from: this.identity
+          });
+        }
       }
     });
 
