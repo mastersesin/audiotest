@@ -26,6 +26,6 @@ steps:
     entrypoint: 'bash'
     args: [
       '-c',
-      'cloudbuildenv=`cat /workspace/.env` && gcloud run deploy jam-demo --image gcr.io/${PROJECT_ID}/jam-demo:${BRANCH_NAME}_${SHORT_SHA} --region asia-east1 --platform managed --update-env-vars $cloudbuildenv'
+      'cloudbuildenv=`cat /workspace/.env` && gcloud run deploy jam-frontend --image gcr.io/${PROJECT_ID}/jam-demo:${BRANCH_NAME}_${SHORT_SHA} --region asia-east1 --platform managed --update-env-vars $cloudbuildenv'
       ]
 timeout: 1234s
