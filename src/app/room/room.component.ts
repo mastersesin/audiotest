@@ -104,15 +104,17 @@ export class RoomComponent implements OnInit {
     return '';
   }
 
+  public getPeerName(p: string) {
+    if (p.includes('@')) {
+      return p.split('@')[0];
+    }
+    return p;
+  }
+
   public showPeers(peers: string | string[]) {
     // console.log(peers);
     if (typeof peers == 'object') {
-      const usernames = peers.map((p) => {
-        if (p.includes('@')) {
-          return p.split('@')[0];
-        }
-        return p;
-      });
+      const usernames = peers.map(this.getPeerName);
       return usernames.join(', ');
     }
     return peers;
