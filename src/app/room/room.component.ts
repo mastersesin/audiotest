@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
+import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
 import { IRoom, RoomService } from '../services/room.service';
 
@@ -316,11 +317,11 @@ export class RoomComponent implements OnInit {
 
   initIdentity(identity: any): void {
     this.identity = identity;
-    this.currentRoomName = identity;
+    this.currentRoomName = uuidv4();
     this.socket.emit('createnewroom',
       {
         user_identity: this.identity,
-        room_name: this.identity
+        room_name: this.currentRoomName
       }
     );
   }
