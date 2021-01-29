@@ -97,6 +97,12 @@ export class RoomService {
   }
 
   getRoomList() {
+    const connectedRoom = this.rooms.find((r) => r.status === 'connected');
+    if (connectedRoom) {
+      // console.log('connected room ', connectedRoom);
+      const disconnectRooms = this.rooms.filter((r) => r.status !== 'connected');
+      return [connectedRoom, ...disconnectRooms];
+    }
     return this.rooms;
   }
 
@@ -105,7 +111,7 @@ export class RoomService {
   }
 
   updateRoom(room: IRoom) {
-    const roomIndex = this.rooms.findIndex((r) => r.id === room.id);
+    const roomIndex = this.rooms.findIndex((r) => r.name === room.name);
     this.rooms[roomIndex] = { ...room };
   }
 

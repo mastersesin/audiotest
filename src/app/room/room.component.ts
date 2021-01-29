@@ -7,6 +7,8 @@ export interface RoomObject {
   [key: string]: string[];
 }
 
+type RoomStatus = 'connected' | 'connecting' | 'disconnect';
+
 @Component({
   selector: 'app-room',
   templateUrl: './room.component.html',
@@ -73,7 +75,11 @@ export class RoomComponent implements OnInit {
         return;
       }
     }
-    const joinedRoom = this.roomService.joinRoom(room);
+    const clickedRoom = {
+      ...room,
+      status: 'connecting'
+    }
+    const joinedRoom = this.roomService.joinRoom(clickedRoom);
     this.joinAudioRoom(joinedRoom.name, this.currentRoomName);
   }
 
@@ -238,12 +244,23 @@ export class RoomComponent implements OnInit {
     });
   }
 
+  showLeaveRoomButton() {
+    if (this.identity && this.currentRoomName && this.status === 'connected') {
+      return true;
+    }
+    return false;
+  }
+
+  leaveRoom() {
+    this.socket.emit('leave', { user_identity: this.identity, current_room: this.currentRoomName });
+    this.status = 'disconnect';
+  }
 
   @HostListener('window:beforeunload', ['$event'])
   unloadHandler(event: Event): any {
     // Your logic on beforeunload
     console.log(event);
-    this.socket.emit('leave', { user_identity: this.identity, current_room: this.currentRoomName });
+    this.leaveRoom();
   }
 
   async onCreateAnswerNeeded(rtcPeerConn: RTCPeerConnection): Promise<any> {
@@ -269,7 +286,7 @@ export class RoomComponent implements OnInit {
     //   conn.remoteStream = null;
     // });
     this.peerConnList = [];
-
+    this.status = 'connecting';
     this.socket.emit('room', {
       command: 'join',
       args: {
@@ -361,11 +378,13 @@ export class RoomComponent implements OnInit {
       if (rtcPeerConn.connectionState === 'connected') {
         // Peers connected!
         console.log('connected');
+        this.status = 'connected';
         this.roomService.getRoomList().forEach((room: IRoom) => {
           if (room.name === this.currentRoomName) {
             this.roomService.updateRoom({
               ...room,
-              status: 'connected'
+              status: 'connected',
+              joined: true
             })
           }
         });
@@ -373,6 +392,11 @@ export class RoomComponent implements OnInit {
     });
   }
 
+  status: RoomStatus = 'disconnect';
+
+  showList() {
+    return this.identity && this.status !== 'connecting';
+  }
   check(): void {
     this.peerConnList.forEach(a => {
       console.log(a);

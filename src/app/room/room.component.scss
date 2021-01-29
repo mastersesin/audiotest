@@ -29,3 +29,20 @@
 
 #remote-video-container {
 }
+
+.user {
+  text-align: center;
+  .status {
+    color: white;
+    margin: 1rem 2rem 1rem 1rem;
+  }
+}
+
+.green-oval {
+  background-color: green;
+  width: 10px;
+  border: 1px solid green;
+  position: absolute;
+  height: 10px;
+  border-radius: 50%;
+}

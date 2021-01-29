@@ -40,14 +40,25 @@
     {{ room.id }}</li>
 </ul> -->
 <hr />
-<div *ngIf="this.identity">
+<div class="user" *ngIf="this.identity">
   Hello <b>{{this.identity}}</b> !
+  <div class="status">
+    <span class="badge rounded-pill" [ngClass]="{
+      'bg-success': status === 'connected',
+      'bg-danger': status === 'disconnect',
+      'bg-secondary': status === 'connecting'
+    }">{{ status }}</span>
+  </div>
+  <div *ngIf="showLeaveRoomButton()">
+    <button class="btn btn-warning" (click)="leaveRoom()">Leave Current Room</button>
+  </div>
 </div>
 <hr />
-<ul *ngIf="this.identity" class="rooms list-group">
+<ul *ngIf="showList()" class="rooms list-group">
   <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
       'active': room.id === selectedRoom?.id,
-      'bg-warning': room?.joined === true,
+      'bg-success-disabled': room?.joined === true,
+      'text-white-disabled':room?.joined === true,
       'joined': room?.joined === true
     }" (click)="onClickOnRoom(room)" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
     <div class=" d-flex w-300 justify-content-between">
@@ -56,7 +67,9 @@
         <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
         <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
           {{room.status}}</span> -->
-        {{room.status}}
+        <!-- {{room.status}} -->
+        <span *ngIf="room.status === 'connected'" class="green-oval"></span>
+        <span *ngIf="room.status === 'connecting'">Connecting...</span>
       </small>
     </div>
     <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
