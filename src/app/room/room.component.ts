@@ -87,6 +87,31 @@ export class RoomComponent implements OnInit {
     this.initIdentity(email);
   }
 
+  private displayName(name: string) {
+    if (name) {
+      const isEmail = name.includes('@');
+      if (isEmail) {
+        const username = name.split('@')[0];
+        return username;
+      }
+    }
+    return '';
+  }
+
+  public showPeers(peers: string | string[]) {
+    // console.log(peers);
+    if (typeof peers == 'object') {
+      const usernames = peers.map((p) => {
+        if (p.includes('@')) {
+          return p.split('@')[0];
+        }
+        return p;
+      });
+      return usernames.join(', ');
+    }
+    return peers;
+  }
+
   ngOnInit(): void {
     this.connect();
     this.socket.on('icecandidatechannel', (response: any) => {
@@ -117,6 +142,7 @@ export class RoomComponent implements OnInit {
           name: thisRoom.room_name,
           peer: thisRoom.peer,
           status: thisRoom.status,
+          displayName: this.displayName(thisRoom.room_name),
         });
       });
     });

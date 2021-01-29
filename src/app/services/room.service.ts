@@ -7,6 +7,7 @@ export interface IRoom {
   status: string;
   hovered?: boolean;
   joined?: boolean;
+  displayName?: string;
 }
 
 @Injectable({
