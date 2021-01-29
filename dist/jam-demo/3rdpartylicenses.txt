@@ -16,6 +16,9 @@ MIT
 @ng-select/ng-select
 MIT
 
+@ngx-toolkit/device
+MIT
+
 after
 MIT
 Copyright (c) 2011 Raynos.
