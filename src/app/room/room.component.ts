@@ -395,7 +395,8 @@ export class RoomComponent implements OnInit {
   status: RoomStatus = 'disconnect';
 
   showList() {
-    return this.identity && this.status !== 'connecting';
+    return this.identity;
+    // && this.status !== 'connecting';
   }
   check(): void {
     this.peerConnList.forEach(a => {

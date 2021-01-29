@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebcamModule } from 'ngx-webcam';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { DeviceModule } from '@ngx-toolkit/device';
 
 import { AppComponent } from './app.component';
 import { WebrtclearnComponent } from './webrtclearn/webrtclearn.component';
@@ -39,7 +40,8 @@ const config: SocketIoConfig = {
     SocketIoModule.forRoot(config),
     WebcamModule,
     AppRoutingModule,
-    NgSelectModule
+    NgSelectModule,
+    DeviceModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

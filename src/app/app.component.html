@@ -1,3 +1,13 @@
+<div *ngIf="notSupportBrowser()">
+  <div class="alert alert-warning text-center" role="alert">
+    Sorry, your browser is not supported. Please use Chrome Browser for the best experience.
+  </div>
+</div>
+<div *ngIf="notSupportOS()">
+  <div class="alert alert-warning text-center" role="alert">
+    Sorry, currently iOS is not supported. Please try another one!
+  </div>
+</div>
 <div class="container">
   <router-outlet></router-outlet>
 </div>
