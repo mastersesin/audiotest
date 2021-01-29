@@ -54,6 +54,14 @@
   </div>
 </div>
 <hr />
+<div class="search">
+  <div class="mb-3">
+    <label for="search-keyword" class="form-label"></label>
+    <input #searchKeyword type="text" class="form-control" id="search-keyword" aria-describedby="search-keyword-helper"
+      placeholder="Find your friends" (keyup)="search(searchKeyword.value)">
+    <div id="search-keyword-helper" class="form-text"></div>
+  </div>
+</div>
 <ul *ngIf="showList()" class="rooms list-group">
   <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
       'active': room.id === selectedRoom?.id,

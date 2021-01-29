@@ -59,8 +59,7 @@ export class RoomComponent implements OnInit {
   }
 
   getRoomList() {
-    const allRooms = this.roomService.getRoomList()
-    return allRooms;
+    return this.roomService.getRoomList();
   }
 
   onClickOnRoom(room: IRoom) {
@@ -149,6 +148,7 @@ export class RoomComponent implements OnInit {
           peer: thisRoom.peer,
           status: thisRoom.status,
           displayName: this.displayName(thisRoom.room_name),
+          peerString: (thisRoom.peer as string[]).join(', ')
         });
       });
     });
@@ -251,9 +251,14 @@ export class RoomComponent implements OnInit {
     return false;
   }
 
+  search(keyword: string) {
+    this.roomService.setKeyword(keyword);
+  }
+
   leaveRoom() {
     this.socket.emit('leave', { user_identity: this.identity, current_room: this.currentRoomName });
     this.status = 'disconnect';
+    window.location.reload();
   }
 
   @HostListener('window:beforeunload', ['$event'])
