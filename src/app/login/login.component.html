@@ -1,0 +1,14 @@
+<div class="container">
+  <h2>JAM</h2>
+  <form class="login-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="mb-3">
+      <label for="email" class="form-label">Email address</label>
+      <input formControlName="email" type="email" class="form-control"
+        [ngClass]="{ 'is-invalid': hasEmailError(), 'is-valid': !hasEmailError() }" id="email">
+      <div *ngIf="hasEmailError()" class="invalid-feedback">{{ getEmailErrorMsg() }}</div>
+      <div *ngIf="!hasEmailError()" class="valid-feedback">Valid Email!</div>
+    </div>
+    <button [disabled]="isDisabled()" type="submit" class="btn btn-primary">Login</button>
+  </form>
+
+</div>
