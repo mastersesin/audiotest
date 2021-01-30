@@ -89,9 +89,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   constructor(private socket: Socket,
     private authService: AuthService, private roomService: RoomService) {
+    console.log('update at 2021-01-30 22-53');
     const leaveRoomCheckerSubscription = this.leaveRoomChecker.subscribe(() => {
-      const checker1 = this.status === 'connected';
-      const checker2 = this.selectedRoom?.peer?.length === 1;
       const checker = this.status === 'connected' && this.selectedRoom?.peer?.length === 1;
       console.log(this.status, this.selectedRoom?.peer);
       if (checker) {
