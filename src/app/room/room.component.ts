@@ -1,5 +1,6 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
+import { Subject, Subscription } from 'rxjs';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
 import { IRoom, RoomService } from '../services/room.service';
@@ -15,7 +16,7 @@ type RoomStatus = 'connected' | 'connecting' | 'disconnect';
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
-export class RoomComponent implements OnInit {
+export class RoomComponent implements OnInit, OnDestroy {
 
   @ViewChild('streamView') streamView: ElementRef | undefined;
   @ViewChild('theirStreamView') theirStreamView: ElementRef | undefined;
@@ -83,9 +84,26 @@ export class RoomComponent implements OnInit {
     this.joinAudioRoom(joinedRoom.name, this.currentRoomName);
   }
 
+  public leaveRoomChecker = new Subject();
+  subscription = new Subscription();
+
   constructor(private socket: Socket,
     private authService: AuthService, private roomService: RoomService) {
+    const leaveRoomCheckerSubscription = this.leaveRoomChecker.subscribe(() => {
+      const checker1 = this.status === 'connected';
+      const checker2 = this.selectedRoom?.peer?.length === 1;
+      const checker = this.status === 'connected' && this.selectedRoom?.peer?.length === 1;
+      console.log(this.status, this.selectedRoom?.peer);
+      if (checker) {
+        this.leaveRoom();
+      }
+    });
+    this.subscription.add(leaveRoomCheckerSubscription);
+  }
 
+  ngOnDestroy() {
+    this.leaveRoomChecker.complete();
+    this.subscription.unsubscribe();
   }
 
   connect() {
@@ -134,6 +152,7 @@ export class RoomComponent implements OnInit {
     });
     this.socket.on('listallroom1', (response: RoomObject[]) => {
       console.log(response);
+      this.leaveRoomChecker.next();
       this.roomService.removeAllRooms();
       response.forEach(room => {
         const key = Object.keys(room)[0];
