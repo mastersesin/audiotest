@@ -69,22 +69,22 @@ export class RoomComponent implements OnInit, OnDestroy {
     return this.roomService.getRoomList();
   }
 
-  // getRoomListUI() {
-  //   const roomByGroup = this.roomService.getRoomList()
-  //     .filter((room) => room.peer.length >= 2 || room.peer[0] !== this.identity)
-  //     .sort((a, b) => a.peer.length < b.peer.length ? 1 : -1);
+  getRoomListUI() {
+    const roomByGroup = this.getRoomList()
+      .filter((room) => room.peer.length >= 2 || room.peer[0] !== this.identity)
+      .sort((a, b) => a.peer.length < b.peer.length ? 1 : -1);
 
-  //   const activeRoomIndex = roomByGroup.findIndex((room) => room.name === this.currentRoomName);
+    const activeRoomIndex = roomByGroup.findIndex((room) => room.name === this.currentRoomName);
 
-  //   if (activeRoomIndex !== -1) {
-  //     // move this room to top
-  //     const [activeRoom] = roomByGroup.splice(activeRoomIndex, 1);
-  //     roomByGroup.unshift(activeRoom);
-  //   }
+    if (activeRoomIndex !== -1) {
+      // move this room to top
+      const [activeRoom] = roomByGroup.splice(activeRoomIndex, 1);
+      roomByGroup.unshift(activeRoom);
+    }
 
-  //   (window as any).roomListUI = roomByGroup;
-  //   return roomByGroup;
-  // }
+    (window as any).roomListUI = roomByGroup;
+    return roomByGroup;
+  }
 
   onClickOnRoom(room: IRoom) {
     const check = this.identity !== null && !room.peer.includes(this.identity);
