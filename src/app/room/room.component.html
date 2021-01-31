@@ -41,6 +41,15 @@
 </ul> -->
 <div class="user" *ngIf="this.identity">
   Hello <b>{{this.identity}}</b> !
+  <div class="duplicateIdentity" *ngIf="isDuplicatedIdentity">
+    <span class="alert">{{identity}} has been logged in on different places.</span>
+    <li>
+      Please try:
+      <ul>Open JAM on only one browser tab</ul>
+      <ul>Open JAM on only one device</ul>
+      <ul>Try to use another email</ul>
+    </li>
+  </div>
 </div>
 <hr />
 <div class="search">
@@ -81,7 +90,7 @@
   </li>
 </ul>
 
-<div *ngIf="!this.identity"><i>You have not specified your identity yet!</i></div>
+
 
 <!-- <button (click)="initIdentity('Ty1')">Ty1</button>
 <button (click)="initIdentity('Ty2')">Ty2</button>
