@@ -135,6 +135,30 @@ export class RoomComponent implements OnInit, OnDestroy {
     return peers;
   }
 
+  xxx(latestPeerList: Array<string>) {
+    console.log('xxx input', latestPeerList);
+    let diff: any[] = [];
+    // loop through the local peer connection list to find the identity of removed user
+    for (let currentPeerItem of this.peerConnList) {
+      console.log('current room ', this.currentRoomName);
+      console.log('current Peer Item ', currentPeerItem);
+      console.log('latest peer list', latestPeerList);
+      const currentUser = (currentPeerItem.remote_user as string);
+      const check = latestPeerList.includes(currentUser);
+      if (!check) {
+        currentPeerItem.peerObj.close();
+        // currentPeerItem.peerObj.removeTrack();
+        // currentPeerItem.peerObj.removeStream();
+        console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
+        console.log('Close');
+        diff.push(currentPeerItem);
+      } else {
+        console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
+      }
+    }
+    return diff;
+  }
+
   ngOnInit(): void {
     this.connect();
     this.socket.on('icecandidatechannel', (response: any) => {
@@ -151,7 +175,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     this.socket.on('listallroom1', (response: RoomObject[]) => {
       console.log(response);
-      this.leaveRoomChecker.next();
+      // this.leaveRoomChecker.next();
       this.roomService.removeAllRooms();
       response.forEach(room => {
         const key = Object.keys(room)[0];
@@ -161,6 +185,15 @@ export class RoomComponent implements OnInit, OnDestroy {
           peer: values[0],
           status: 'disconnect'
         } as any;
+        const check1 = room.room_name === this.currentRoomName;
+        const check2 = this.xxx(thisRoom.peer);
+        console.log('check 2 ', check2);
+        if (check2.length > 0) {
+          check2.forEach((removeConn) => {
+            this.peerConnList = this.peerConnList.filter((peerConnItem) => peerConnItem.remote_user !== removeConn.remote_user);
+          });
+        }
+
         this.roomService.addRoom({
           id: new Date().getTime().toString(),
           name: thisRoom.room_name,
