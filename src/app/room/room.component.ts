@@ -21,6 +21,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   @ViewChild('streamView') streamView: ElementRef | undefined;
   @ViewChild('theirStreamView') theirStreamView: ElementRef | undefined;
 
+  allowedGetUserMedia = false;
+
   // Get user media constraint
   constraints = { video: false, audio: true };
   remoteStream = new MediaStream();
@@ -98,6 +100,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       }
     });
     this.subscription.add(leaveRoomCheckerSubscription);
+    this.askForMicrophonePermission();
   }
 
   ngOnDestroy() {
@@ -333,8 +336,15 @@ export class RoomComponent implements OnInit, OnDestroy {
     console.log('setRemoteDesc done');
   }
 
-  test(): any {
-    navigator.mediaDevices.getUserMedia({ audio: true });
+  askForMicrophonePermission(): any {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
+      console.log(res);
+      if (res.active === true) {
+        this.allowedGetUserMedia = true;
+      }
+    }).catch((err) => {
+      console.warn(err);
+    });
   }
 
   joinAudioRoom(roomName: string, currentRoomName: string): void {

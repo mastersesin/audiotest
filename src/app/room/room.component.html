@@ -53,44 +53,50 @@
     <button class="btn btn-warning" (click)="leaveRoom()">Leave Current Room</button>
   </div>
 </div>
-<hr />
-<div class="search">
-  <div class="mb-3">
-    <label for="search-keyword" class="form-label"></label>
-    <input #searchKeyword type="text" class="form-control" id="search-keyword" aria-describedby="search-keyword-helper"
-      placeholder="Find your friends" (keyup)="search(searchKeyword.value)">
-    <div id="search-keyword-helper" class="form-text"></div>
+<div *ngIf="allowedGetUserMedia">
+  <hr />
+  <div class="search">
+    <div class="mb-3">
+      <label for="search-keyword" class="form-label"></label>
+      <input #searchKeyword type="text" class="form-control" id="search-keyword"
+        aria-describedby="search-keyword-helper" placeholder="Find your friends" (keyup)="search(searchKeyword.value)">
+      <div id="search-keyword-helper" class="form-text"></div>
+    </div>
   </div>
-</div>
-<ul *ngIf="showList()" class="rooms list-group">
-  <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
+  <ul *ngIf="showList()" class="rooms list-group">
+    <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
       'active': room.id === selectedRoom?.id,
       'bg-success-disabled': room?.joined === true,
       'text-white-disabled':room?.joined === true,
       'joined': room?.joined === true
     }" (click)="onClickOnRoom(room)" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
-    <div class=" d-flex w-300 justify-content-between">
-      <h5 class="mb-1">{{room.displayName}}</h5>
-      <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
-        <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
+      <div class=" d-flex w-300 justify-content-between">
+        <h5 class="mb-1">{{room.displayName}}</h5>
+        <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
+          <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
         <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
           {{room.status}}</span> -->
-        <!-- {{room.status}} -->
-        <span *ngIf="room.status === 'connected'" class="green-oval"></span>
-        <span *ngIf="room.status === 'connecting'">Connecting...</span>
+          <!-- {{room.status}} -->
+          <span *ngIf="room.status === 'connected'" class="green-oval"></span>
+          <span *ngIf="room.status === 'connecting'">Connecting...</span>
+        </small>
+      </div>
+      <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
+      <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
+      <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
+        {{ showRoomTips(room)}}
       </small>
-    </div>
-    <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
-    <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
-    <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
-      {{ showRoomTips(room)}}
-    </small>
-  </li>
-</ul>
+    </li>
+  </ul>
 
-<div *ngIf="!this.identity"><i>You have not specified your identity yet!</i></div>
+  <div *ngIf="!this.identity"><i>You have not specified your identity yet!</i></div>
 
-<button class="btn btn-primary" (click)="check()">Check</button>
+  <!-- <button class="btn btn-primary" (click)="check()">Check</button> -->
+</div>
+
+<div *ngIf="!allowedGetUserMedia" class="text-center">
+  Mic disabled.
+</div>
 
 <!-- <button (click)="initIdentity('Ty1')">Ty1</button>
 <button (click)="initIdentity('Ty2')">Ty2</button>
