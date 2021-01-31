@@ -64,7 +64,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   getRoomList() {
-    return this.roomService.getRoomList().filter((room) => room.name !== this.currentRoomName);
+    return this.roomService.getRoomList().filter((room) => room.peer[0] !== this.identity);
   }
 
   onClickOnRoom(room: IRoom) {
