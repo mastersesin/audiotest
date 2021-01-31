@@ -183,7 +183,6 @@ export class RoomComponent implements OnInit, OnDestroy {
           }
         }
 
-
         this.roomService.addRoom({
           id: new Date().getTime().toString(),
           name: thisRoom.room_name,
@@ -194,10 +193,14 @@ export class RoomComponent implements OnInit, OnDestroy {
           peerString: (thisRoom.peer as string[]).join(', ')
         });
       });
+
+      // when the current connected room only has the current user as the last user, leave the room
       const currentRoom = this.roomService.getRoomList().find((r) => r.name === this.currentRoomName);
-      currentRoom && this.roomService.setCurrentRoom(currentRoom);
-      if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName) {
-        this.leaveRoom();
+      if (currentRoom) {
+        this.roomService.setCurrentRoom(currentRoom);
+        if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName) {
+          this.leaveRoom();
+        }
       }
 
       /**
@@ -403,13 +406,15 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.sendLeaveRequest(roomName);
     this.status = 'disconnect';
     //  add leave room handler
-    this.peerConnList.forEach((peerConnItem) => {
-      peerConnItem.peerObj.close();
-    });
-    this.peerConnList = [];
-    console.log('Reconnect after leave.');
-    this.connect();
-    // window.location.reload();
+    // this.peerConnList.forEach((peerConnItem) => {
+    //   peerConnItem.peerObj.close();
+    // });
+    // this.peerConnList = [];
+    // console.log('Reconnect after leave.');
+    // this.connect();
+
+    // reload on leave
+    window.location.reload();
   }
 
   @HostListener('window:beforeunload', ['$event'])
