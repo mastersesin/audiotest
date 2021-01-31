@@ -37,19 +37,18 @@ export class RoomComponent implements OnInit, OnDestroy {
   currentRoomName: any = null;
 
   // configuration = environment.mediaServerConfiguration;
-
   configuration = {
     iceServers: [
       {
-        urls: 'turn:35.214.95.239:1609?transport=udp',
+        urls: 'turn:35.241.95.239:1609?transport=udp',
         username: 'Ty1',
         credential: 'password'
       },
       {
-        urls: 'stun:35.214.95.239:1609',
+        urls: 'stun:35.241.95.239:1609',
       }
     ]
-  }
+  };
 
   get selectedRoom() {
     return this.roomService.getCurrentRoom();
@@ -206,7 +205,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     this.socket.on('listallroom1', (response: RoomObject[]) => {
       console.log(response);
-      // this.leaveRoomChecker.next();
+      this.leaveRoomChecker.next();
       this.roomService.removeAllRooms();
       response.forEach(room => {
         const key = Object.keys(room)[0];
