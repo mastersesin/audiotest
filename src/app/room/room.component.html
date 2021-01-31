@@ -42,11 +42,6 @@
   </div>
 </div>
 <div *ngIf="allowedGetUserMedia">
-  <hr />
-  <div class="text-center">
-    <button *ngIf="muted === false" class="btn btn-primary mute" (click)="mute()">Mute</button>
-    <button *ngIf="muted === true" class="btn btn-primary mute" (click)="unmute()">Unmute</button>
-  </div>
   <div class="search">
     <div class="mb-3">
       <label for="search-keyword" class="form-label"></label>
@@ -78,6 +73,11 @@
         {{ showRoomTips(room)}}
       </small> -->
       <div class="btn-group">
+        <div class="text-center">
+          <button *ngIf="selectedRoom?.name === room?.name && status === 'connected' && muted === false" class="btn btn-primary mute" (click)="mute()">Mute</button>
+          <button *ngIf="selectedRoom?.name === room?.name && status === 'connected' && muted === true" class="btn btn-primary unmute" (click)="unmute()">Unmute</button>
+        </div>
+
         <button
           class="join btn"
           [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
