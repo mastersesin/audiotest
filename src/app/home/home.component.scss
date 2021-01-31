@@ -4,5 +4,13 @@
   width: 100%;
   .header {
     text-align: center;
+    margin-bottom: 30px;
+
+    .logout {
+      background-color: transparent;
+      border: solid 1px orange;
+      color: orange;
+      font-size: 14px;
+    }
   }
 }
