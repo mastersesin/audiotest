@@ -71,7 +71,7 @@ export class RoomService {
     return this.selectedRoom;
   }
 
-  private setCurrentRoom(room: IRoom) {
+  setCurrentRoom(room: IRoom) {
     this.selectedRoom = { ...room };
     this.updateRoom(room);
   }

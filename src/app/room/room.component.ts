@@ -159,7 +159,7 @@ export class RoomComponent implements OnInit, OnDestroy {
        * If a new list rooms dont have room name that stored in `this.currentRoomName`
        * we need to leave that room named `currentRoomName`
        */
-      if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] === this.currentRoomName)) {
+      if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] == this.currentRoomName)) {
         this.leaveRoom();
       }
 
@@ -194,6 +194,11 @@ export class RoomComponent implements OnInit, OnDestroy {
           peerString: (thisRoom.peer as string[]).join(', ')
         });
       });
+      const currentRoom = this.roomService.getRoomList().find((r) => r.name === this.currentRoomName);
+      currentRoom && this.roomService.setCurrentRoom(currentRoom);
+      if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName) {
+        this.leaveRoom();
+      }
 
       /**
        * The app currently has an issue about duplicate identity, this issue should be fixed on backend side
