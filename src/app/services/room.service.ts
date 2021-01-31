@@ -110,13 +110,14 @@ export class RoomService {
   }
 
   private roomList() {
+    const normalize = (str?: string) => String(str || '').toLowerCase().replace(/\.\_\-/g, '') || '';
     // console.log('get room list');
     if (this.filter.keyword === '') {
       // console.log(this.rooms);
       return this.rooms;
     }
     // console.log(this.rooms);
-    const filtered = this.rooms.filter((r) => r.peerString?.includes(this.filter.keyword));
+    const filtered = this.rooms.filter((r) => normalize(r.peerString).includes(normalize(this.filter.keyword)));
     // console.log(filtered);
     return filtered;
   }
