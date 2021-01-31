@@ -27,14 +27,24 @@
       button {
         background-color: transparent;
         color: green;
-        border: solid 1px;
         height: 33px;
         font-size: 14px;
-        font-weight: bold;
+        cursor: pointer;
 
         &.join {
           color: green;
-          border-color: green;
+          border: none;
+          &:hover {
+            border: solid 1px green;
+          }
+
+          &.join-group {
+            border: solid 1px;
+            padding-left: 20px;
+            padding-right: 20px;
+            font-weight: bold;
+            border-color:green;
+          }
         }
 
         &.leave {
@@ -42,6 +52,11 @@
           border: none;
           font-weight: initial;
         }
+      }
+
+      .connecting-status {
+        font-size: 12px;
+        font-style: italic;
       }
     }
   }

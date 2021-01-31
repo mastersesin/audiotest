@@ -57,12 +57,7 @@
   </div>
 
   <ul *ngIf="showList()" class="rooms list-group">
-    <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
-      'active': room.id === selectedRoom?.id,
-      'bg-success-disabled': room?.joined === true,
-      'text-white-disabled':room?.joined === true,
-      'joined': room?.joined === true
-    }" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
+    <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
       <div class="d-flex justify-content-between">
         <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
           <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
@@ -70,7 +65,6 @@
             {{room.status}}</span> -->
           <!-- {{room.status}} -->
           <span *ngIf="room.status === 'connected'" class="green-oval"></span>
-          <span *ngIf="room.status === 'connecting'">Connecting...</span>
         </small>
       </div>
       <!-- <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
@@ -80,12 +74,20 @@
       </small> -->
       <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
       <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
-      <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
+      <!-- <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
         {{ showRoomTips(room)}}
-      </small>
+      </small> -->
       <div class="btn-group">
-        <button class="join btn" *ngIf="room.status !== 'connected'" (click)="onClickOnRoom(room)">Join</button>
-        <button class="leave btn" *ngIf="room.joined" (click)="leaveRoom()">Leave</button>
+        <button
+          class="join btn"
+          [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
+          *ngIf="selectedRoom?.name !== room?.name"
+          (click)="onClickOnRoom(room)"
+        >
+          Join
+        </button>
+        <button class="leave btn" *ngIf="selectedRoom?.name === room?.name && status === 'connected'" (click)="leaveRoom()">Leave</button>
+        <span class="connecting-status" *ngIf="selectedRoom?.name === room?.name && status === 'connecting'">Connecting...</span>
       </div>
     </li>
   </ul>
@@ -102,7 +104,6 @@
       <button (click)="initIdentity('Ty3')">Ty3</button>
 <button (click)="check()">check</button> -->
 
-<hr />
 <video id="local-video-container" #streamView width="0" height="0" autoplay>
   <source type='video/webm; codecs="opus,vp8"'>
   Your browser does not support HTML5 video.
