@@ -350,7 +350,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   leaveRoom(roomName = this.currentRoomName) {
     this.sendLeaveRequest(roomName);
     this.status = 'disconnect';
-    window.location.reload();
+    // window.location.reload();
   }
 
   @HostListener('window:beforeunload', ['$event'])
