@@ -70,11 +70,20 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   // getRoomListUI() {
-  //   const list = this.roomService.getRoomList()
-  //     .filter((room) => room.peer[0] !== this.identity)
-  //     .sort((a, b) => b.peer.length - a.peer.length);
-  //   (window as any).roomListUI = list;
-  //   return list;
+  //   const roomByGroup = this.roomService.getRoomList()
+  //     .filter((room) => room.peer.length >= 2 || room.peer[0] !== this.identity)
+  //     .sort((a, b) => a.peer.length < b.peer.length ? 1 : -1);
+
+  //   const activeRoomIndex = roomByGroup.findIndex((room) => room.name === this.currentRoomName);
+
+  //   if (activeRoomIndex !== -1) {
+  //     // move this room to top
+  //     const [activeRoom] = roomByGroup.splice(activeRoomIndex, 1);
+  //     roomByGroup.unshift(activeRoom);
+  //   }
+
+  //   (window as any).roomListUI = roomByGroup;
+  //   return roomByGroup;
   // }
 
   onClickOnRoom(room: IRoom) {
