@@ -404,18 +404,20 @@ export class RoomComponent implements OnInit, OnDestroy {
     );
   }
 
-   /**
-   * Need to check whether this identity is being duplicated
-   * If yes, leave those rooms
-   */
+  /**
+  * Need to check whether this identity is being duplicated
+  * If yes, leave those rooms
+  */
   cleanDuplicateIdentity() {
     const joinedRooms = this.roomService.getRoomOfPeer(this.identity);
 
     joinedRooms?.forEach((joinedRoom) => {
       const isDuplicatedRoom = joinedRoom.name !== this.currentRoomName;
-      if (isDuplicatedRoom) {
-        this.isDuplicatedIdentity = true;
-        this.sendLeaveRequest(joinedRoom.name);
+      if (this.allowedGetUserMedia) {
+        if (isDuplicatedRoom) {
+          this.isDuplicatedIdentity = true;
+          this.sendLeaveRequest(joinedRoom.name);
+        }
       }
     });
   }

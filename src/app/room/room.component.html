@@ -79,11 +79,11 @@
           <span *ngIf="room.status === 'connecting'">Connecting...</span>
         </small>
       </div>
-      <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
+      <!-- <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
       <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
       <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
         {{ showRoomTips(room)}}
-      </small>
+      </small> -->
       <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
       <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
       <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
@@ -98,7 +98,7 @@
 
 </div>
 
-<div *ngIf="!allowedGetUserMedia" class="text-center">
+<div *ngIf="!allowedGetUserMedia" class="text-center text-white bg-danger">
   Mic disabled.
 </div>
 

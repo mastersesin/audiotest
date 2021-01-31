@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
 
   getEmailErrorMsg() {
     const errors = this.form.controls.email.errors;
-    console.log(errors);
+    // console.log(errors);
     if (errors === null) {
       return '';
     }
