@@ -34,7 +34,7 @@
 
         &.join {
           color: green;
-          border-color:green;
+          border-color: green;
         }
 
         &.leave {
@@ -93,4 +93,8 @@
   border-radius: 50%;
   right: 18px;
   top: 10px;
+}
+
+.mute {
+  width: 100px;
 }

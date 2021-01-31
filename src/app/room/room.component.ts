@@ -138,27 +138,39 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   xxx(latestPeerList: Array<string>) {
-    console.log('xxx input', latestPeerList);
+    // console.log('xxx input', latestPeerList);
     let diff: any[] = [];
     // loop through the local peer connection list to find the identity of removed user
     for (let currentPeerItem of this.peerConnList) {
-      console.log('current room ', this.currentRoomName);
-      console.log('current Peer Item ', currentPeerItem);
-      console.log('latest peer list', latestPeerList);
+      // console.log('current room ', this.currentRoomName);
+      // console.log('current Peer Item ', currentPeerItem);
+      // console.log('latest peer list', latestPeerList);
       const currentUser = (currentPeerItem.remote_user as string);
       const check = latestPeerList.includes(currentUser);
       if (!check) {
         currentPeerItem.peerObj.close();
         // currentPeerItem.peerObj.removeTrack();
         // currentPeerItem.peerObj.removeStream();
-        console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
+        // console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
         console.log('Close');
         diff.push(currentPeerItem);
       } else {
-        console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
+        // console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
       }
     }
     return diff;
+  }
+
+  muted = false;
+  mute() {
+    this.muted = true;
+    this.peerConnList.forEach((peerConnItem) => {
+      console.log(peerConnItem);
+    });
+  }
+
+  unmute() {
+    this.muted = false;
   }
 
   ngOnInit(): void {
@@ -193,7 +205,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         } as any;
         const check1 = room.room_name === this.currentRoomName;
         const check2 = this.xxx(thisRoom.peer);
-        console.log('check 2 ', check2);
+        // console.log('check 2 ', check2);
         if (check2.length > 0) {
           check2.forEach((removeConn) => {
             this.peerConnList = this.peerConnList.filter((peerConnItem) => peerConnItem.remote_user !== removeConn.remote_user);
