@@ -26,6 +26,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   remoteStream = new MediaStream();
   isAddRemoteStream = false;
   identity: any = null;
+  isDuplicatedIdentity: boolean = false;
   iceCandidate = [];
   isSentIceCandidate = false;
   peerConnList: any[] = [];
@@ -138,7 +139,11 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // FOR DEV, REMOVE FOR PROD
+    (window as any).room = this;
+
     this.connect();
+
     this.socket.on('icecandidatechannel', (response: any) => {
       console.log(response);
       if (response.send_to === this.identity) {
@@ -172,6 +177,12 @@ export class RoomComponent implements OnInit, OnDestroy {
           peerString: (thisRoom.peer as string[]).join(', ')
         });
       });
+
+      /**
+       * The app currently has an issue about duplicate identity, this issue should be fixed on backend side
+       * But now we can temporary fix it on frontend for the demo
+       */
+      this.cleanDuplicateIdentity();
     });
     this.socket.on('room', (response: any) => {
       if (response.command === 'info' && response.args) {
@@ -276,8 +287,12 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.roomService.setKeyword(keyword);
   }
 
-  leaveRoom() {
-    this.socket.emit('leave', { user_identity: this.identity, current_room: this.currentRoomName });
+  sendLeaveRequest(roomName: string) {
+    this.socket.emit('leave', { user_identity: this.identity, current_room: roomName });
+  }
+
+  leaveRoom(roomName = this.currentRoomName) {
+    this.sendLeaveRequest(roomName);
     this.status = 'disconnect';
     window.location.reload();
   }
@@ -344,6 +359,22 @@ export class RoomComponent implements OnInit, OnDestroy {
         room_name: this.currentRoomName
       }
     );
+  }
+
+   /**
+   * Need to check whether this identity is being duplicated
+   * If yes, leave those rooms
+   */
+  cleanDuplicateIdentity() {
+    const joinedRooms = this.roomService.getRoomOfPeer(this.identity);
+
+    joinedRooms?.forEach((joinedRoom) => {
+      const isDuplicatedRoom = joinedRoom.name !== this.currentRoomName;
+      if (isDuplicatedRoom) {
+        this.isDuplicatedIdentity = true;
+        this.sendLeaveRequest(joinedRoom.name);
+      }
+    });
   }
 
   initWebRTCDependencies(rtcPeerConn: RTCPeerConnection): Promise<any> {
