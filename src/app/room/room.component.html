@@ -57,7 +57,7 @@
   </div>
 
   <ul *ngIf="showList()" class="rooms list-group">
-    <li *ngFor="let room of getRoomListUI()" class="room list-group-item list-group-item-action" [ngClass]="{
+    <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
       'active': room.id === selectedRoom?.id,
       'bg-success-disabled': room?.joined === true,
       'text-white-disabled':room?.joined === true,
