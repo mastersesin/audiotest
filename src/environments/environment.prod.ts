@@ -6,12 +6,12 @@ export const environment = {
   mediaServerConfiguration: {
     iceServers: [
       {
-        urls: 'turn:35.214.95.239:1609?transport=udp',
+        urls: 'turn:35.241.95.239:1609?transport=udp',
         username: 'Ty1',
         credential: 'password'
       },
       {
-        urls: 'stun:35.214.95.239:1609',
+        urls: 'stun:35.241.95.239:1609',
       }
     ]
   }
