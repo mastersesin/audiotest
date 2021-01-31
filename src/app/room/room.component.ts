@@ -58,9 +58,8 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   getRoomListUI() {
-    const list = this.roomService.getRoomList().filter((room) => room.peer[0] !== this.identity);
+    const list = this.roomService.getRoomList().filter((room) => room.peer[0] !== this.identity).sort((a, b) => b.peer.length - a.peer.length);
     (window as any).roomListUI = list;
-
     return list;
   }
 
