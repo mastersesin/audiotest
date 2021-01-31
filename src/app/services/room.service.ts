@@ -143,4 +143,8 @@ export class RoomService {
   removeRoom(room: IRoom) {
     this.rooms = [...this.rooms].filter(r => r.id !== room.id);
   }
+
+  getRoomOfPeer(peer: string) {
+    return this.rooms.filter((room) => room.peer.includes(peer));
+  }
 }

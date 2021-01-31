@@ -17,12 +17,12 @@
 </ng-select> -->
 
 <hr />
-<video id="local-video-container" #streamView width="40" height="40" autoplay>
+<video id="local-video-container" #streamView width="0" height="0" autoplay>
   <source type='video/webm; codecs="opus,vp8"'>
   Your browser does not support HTML5 video.
 </video>
 <div id="remote-video-container" *ngFor="let obj of this.peerConnList">
-  <video width="40" height="40" [srcObject]="obj.remoteStream" autoplay>
+  <video width="0" height="0" [srcObject]="obj.remoteStream" autoplay>
   </video>
 </div>
 
@@ -39,18 +39,16 @@
     [ngClass]="{ 'active': room.id === selectedRoom?.id }" (click)="onClickOnRoom(room)">
     {{ room.id }}</li>
 </ul> -->
-<hr />
 <div class="user" *ngIf="this.identity">
   Hello <b>{{this.identity}}</b> !
-  <div class="status">
-    <span class="badge rounded-pill" [ngClass]="{
-      'bg-success': status === 'connected',
-      'bg-danger': status === 'disconnect',
-      'bg-secondary': status === 'connecting'
-    }">{{ status }}</span>
-  </div>
-  <div *ngIf="showLeaveRoomButton()">
-    <button class="btn btn-warning" (click)="leaveRoom()">Leave Current Room</button>
+  <div class="duplicateIdentity" *ngIf="isDuplicatedIdentity">
+    <span class="alert">{{identity}} has been logged in on different places.</span>
+    <li>
+      Please try:
+      <ul>Open JAM on only one browser tab</ul>
+      <ul>Open JAM on only one device</ul>
+      <ul>Try to use another email</ul>
+    </li>
   </div>
 </div>
 <div *ngIf="allowedGetUserMedia">
@@ -63,19 +61,19 @@
       <div id="search-keyword-helper" class="form-text"></div>
     </div>
   </div>
+
   <ul *ngIf="showList()" class="rooms list-group">
     <li *ngFor="let room of getRoomList()" class="room list-group-item list-group-item-action" [ngClass]="{
       'active': room.id === selectedRoom?.id,
       'bg-success-disabled': room?.joined === true,
       'text-white-disabled':room?.joined === true,
       'joined': room?.joined === true
-    }" (click)="onClickOnRoom(room)" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
-      <div class=" d-flex w-300 justify-content-between">
-        <h5 class="mb-1">{{room.displayName}}</h5>
+    }" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
+      <div class="d-flex justify-content-between">
         <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
           <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
-        <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
-          {{room.status}}</span> -->
+          <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
+            {{room.status}}</span> -->
           <!-- {{room.status}} -->
           <span *ngIf="room.status === 'connected'" class="green-oval"></span>
           <span *ngIf="room.status === 'connecting'">Connecting...</span>
@@ -86,19 +84,26 @@
       <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
         {{ showRoomTips(room)}}
       </small>
+      <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
+      <p *ngIf="!(room.peer?.length)" class="mb-1">No members</p>
+      <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
+        {{ showRoomTips(room)}}
+      </small>
+      <div class="btn-group">
+        <button class="join btn" *ngIf="room.status !== 'connected'" (click)="onClickOnRoom(room)">Join</button>
+        <button class="leave btn" *ngIf="room.joined" (click)="leaveRoom()">Leave</button>
+      </div>
     </li>
   </ul>
 
-  <div *ngIf="!this.identity"><i>You have not specified your identity yet!</i></div>
-
-  <!-- <button class="btn btn-primary" (click)="check()">Check</button> -->
 </div>
 
 <div *ngIf="!allowedGetUserMedia" class="text-center">
   Mic disabled.
 </div>
 
+
 <!-- <button (click)="initIdentity('Ty1')">Ty1</button>
-<button (click)="initIdentity('Ty2')">Ty2</button>
-<button (click)="initIdentity('Ty3')">Ty3</button>
+      <button (click)="initIdentity('Ty2')">Ty2</button>
+      <button (click)="initIdentity('Ty3')">Ty3</button>
 <button (click)="check()">check</button> -->
