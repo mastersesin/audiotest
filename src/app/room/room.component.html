@@ -16,16 +16,6 @@
   <ng-option *ngFor="let room of getRoomList()" [value]="room">{{room.id}}</ng-option>
 </ng-select> -->
 
-<hr />
-<video id="local-video-container" #streamView width="0" height="0" autoplay>
-  <source type='video/webm; codecs="opus,vp8"'>
-  Your browser does not support HTML5 video.
-</video>
-<div id="remote-video-container" *ngFor="let obj of this.peerConnList">
-  <video width="0" height="0" [srcObject]="obj.remoteStream" autoplay>
-  </video>
-</div>
-
 <!--<ng-template [ngIf]="toggle">-->
 <!--  <div *ngFor="let obj of this.peerConnList">-->
 <!--    {{obj.remote_user}}-->
@@ -107,3 +97,13 @@
       <button (click)="initIdentity('Ty2')">Ty2</button>
       <button (click)="initIdentity('Ty3')">Ty3</button>
 <button (click)="check()">check</button> -->
+
+<hr />
+<video id="local-video-container" #streamView width="0" height="0" autoplay>
+  <source type='video/webm; codecs="opus,vp8"'>
+  Your browser does not support HTML5 video.
+</video>
+<div id="remote-video-container" *ngFor="let obj of this.peerConnList">
+  <video width="0" height="0" [srcObject]="obj.remoteStream" autoplay>
+  </video>
+</div>
