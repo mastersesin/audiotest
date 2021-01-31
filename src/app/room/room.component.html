@@ -84,7 +84,7 @@
           *ngIf="selectedRoom?.name !== room?.name"
           (click)="onClickOnRoom(room)"
         >
-          Join
+          {{ room && room.peer && room.peer.length >= 2 ? 'Join' : 'Talk' }}
         </button>
         <button class="leave btn" *ngIf="selectedRoom?.name === room?.name && status === 'connected'" (click)="leaveRoom()">Leave</button>
         <span class="connecting-status" *ngIf="selectedRoom?.name === room?.name && status === 'connecting'">Connecting...</span>
