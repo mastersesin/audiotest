@@ -74,19 +74,19 @@
       </small> -->
       <div class="btn-group">
         <div class="text-center">
-          <button *ngIf="status === 'connected' && muted === false" class="btn btn-primary mute" (click)="mute()">Mute</button>
-          <button *ngIf="status === 'connected' && muted === true" class="btn btn-primary unmute" (click)="unmute()">Unmute</button>
+          <button *ngIf="room.status === 'connected' && muted === false" class="btn btn-primary mute" (click)="mute()">Mute</button>
+          <button *ngIf="room.status === 'connected' && muted === true" class="btn btn-primary unmute" (click)="unmute()">Unmute</button>
         </div>
 
         <button
           class="join btn"
           [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
-          *ngIf="selectedRoom?.name !== room?.name && status !== 'connected'"
+          *ngIf="currentRoomName !== room?.name && room.status !== 'connected'"
           (click)="onClickOnRoom(room)"
         >
           {{ room && room.peer && room.peer.length >= 2 ? 'Join' : 'Talk' }}
         </button>
-        <button class="leave btn" *ngIf="status === 'connected'" (click)="leaveRoom()">Leave</button>
+        <button class="leave btn" *ngIf="room.status === 'connected'" (click)="leaveRoom()">Leave</button>
         <span class="connecting-status" *ngIf="selectedRoom?.name === room?.name && status === 'connecting'">Connecting...</span>
       </div>
     </li>

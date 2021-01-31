@@ -218,6 +218,15 @@ export class RoomComponent implements OnInit, OnDestroy {
       console.log(response);
       this.leaveRoomChecker.next();
       this.roomService.removeAllRooms();
+
+      /**
+       * If a new list rooms dont have room name that stored in `this.currentRoomName`
+       * we need to leave that room named `currentRoomName`
+       */
+      if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] === this.currentRoomName)) {
+        this.leaveRoom();
+      }
+
       response.forEach(room => {
         const key = Object.keys(room)[0];
         const values = Object.keys(room).map(key1 => room[key1]);
@@ -364,7 +373,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   leaveRoom(roomName = this.currentRoomName) {
     this.sendLeaveRequest(roomName);
     this.status = 'disconnect';
-    // window.location.reload();
+    window.location.reload();
   }
 
   @HostListener('window:beforeunload', ['$event'])
