@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Subject, Subscription } from 'rxjs';
+import { environment } from 'src/environments/environment';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
 import { IRoom, RoomService } from '../services/room.service';
@@ -35,18 +36,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   toggle = false;
   currentRoomName: any = null;
 
-  configuration = {
-    iceServers: [
-      {
-        urls: 'turn:34.123.205.86:1609?transport=udp',
-        username: 'Ty1',
-        credential: 'password'
-      },
-      {
-        urls: 'stun:34.123.205.86:1609',
-      },
-    ]
-  };
+  configuration = environment.mediaServerConfiguration;
 
   get selectedRoom() {
     return this.roomService.getCurrentRoom();
@@ -68,7 +58,10 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   getRoomListUI() {
-    return this.roomService.getRoomList().filter((room) => room.peer[0] !== this.identity);
+    const list = this.roomService.getRoomList().filter((room) => room.peer[0] !== this.identity);
+    (window as any).roomListUI = list;
+
+    return list;
   }
 
   onClickOnRoom(room: IRoom) {
