@@ -218,7 +218,7 @@ export class RoomComponent implements OnInit, OnDestroy {
        * The app currently has an issue about duplicate identity, this issue should be fixed on backend side
        * But now we can temporary fix it on frontend for the demo
        */
-      this.cleanDuplicateIdentity();
+      // this.cleanDuplicateIdentity();
     });
     this.socket.on('room', (response: any) => {
       if (response.command === 'info' && response.args) {
