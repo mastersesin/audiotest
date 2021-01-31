@@ -218,13 +218,16 @@ export class RoomComponent implements OnInit, OnDestroy {
           status: 'disconnect'
         } as any;
         const check1 = room.room_name === this.currentRoomName;
-        const check2 = this.xxx(thisRoom.peer);
-        // console.log('check 2 ', check2);
-        if (check2.length > 0) {
-          check2.forEach((removeConn) => {
-            this.peerConnList = this.peerConnList.filter((peerConnItem) => peerConnItem.remote_user !== removeConn.remote_user);
-          });
+        if (check1) {
+          const check2 = this.xxx(thisRoom.peer);
+          // console.log('check 2 ', check2);
+          if (check2.length > 0) {
+            check2.forEach((removeConn) => {
+              this.peerConnList = this.peerConnList.filter((peerConnItem) => peerConnItem.remote_user !== removeConn.remote_user);
+            });
+          }
         }
+
 
         this.roomService.addRoom({
           id: new Date().getTime().toString(),
