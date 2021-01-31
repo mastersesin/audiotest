@@ -10,6 +10,12 @@ export interface RoomObject {
   [key: string]: string[];
 }
 
+interface IConnection {
+  peerObj: RTCPeerConnection;
+  remote_user: string;
+  remoteStream?: MediaStream;
+}
+
 type RoomStatus = 'connected' | 'connecting' | 'disconnect';
 
 @Component({
@@ -32,7 +38,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   isDuplicatedIdentity: boolean = false;
   iceCandidate = [];
   isSentIceCandidate = false;
-  peerConnList: any[] = [];
+  peerConnList: IConnection[] = [];
   toggle = false;
   currentRoomName: any = null;
 
@@ -184,16 +190,29 @@ export class RoomComponent implements OnInit, OnDestroy {
     return diff;
   }
 
+  private enableMicrophone(value: boolean) {
+    this.peerConnList.forEach((peerConnItem) => {
+      const audioTracks = peerConnItem.remoteStream?.getAudioTracks();
+      audioTracks?.forEach((audioTrack) => {
+        audioTrack.enabled = value;
+      });
+    });
+    this.userMedia().then((mediaStream) => {
+      mediaStream.getAudioTracks().forEach((audioTrack) => {
+        // audioTrack.enabled = value;
+      });
+    });
+  }
+
   muted = false;
   mute() {
     this.muted = true;
-    this.peerConnList.forEach((peerConnItem) => {
-      console.log(peerConnItem);
-    });
+    this.enableMicrophone(false);
   }
 
   unmute() {
     this.muted = false;
+    this.enableMicrophone(true);
   }
 
   ngOnInit(): void {
@@ -287,7 +306,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             const localStream = new MediaStream();
             this.initWebRTCDependencies(rtcPeerConn).then(stream => {
               stream.getTracks().forEach((track: any) => {
-                console.log('Track add');
+                console.log('Track add', track);
                 rtcPeerConn.addTrack(track, stream);
                 if (track.kind === 'video') {
                   localStream.addTrack(track);
@@ -310,7 +329,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         const localStream = new MediaStream();
         this.initWebRTCDependencies(rtcPeerConnAnswer).then(stream => {
           stream.getTracks().forEach((track: any) => {
-            console.log('Track add');
+            console.log('Track add', track);
             rtcPeerConnAnswer.addTrack(track, stream);
             if (track.kind === 'video') {
               localStream.addTrack(track);
@@ -396,8 +415,12 @@ export class RoomComponent implements OnInit, OnDestroy {
     console.log('setRemoteDesc done');
   }
 
+  private userMedia() {
+    return navigator.mediaDevices.getUserMedia({ audio: true });
+  }
+
   askForMicrophonePermission(): any {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((res) => {
+    this.userMedia().then((res) => {
       console.log(res);
       if (res.active === true) {
         this.allowedGetUserMedia = true;

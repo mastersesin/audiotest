@@ -52,7 +52,8 @@
   </div>
 
   <ul *ngIf="showList()" class="rooms list-group">
-    <li *ngFor="let room of getRoomListUI()" class="room list-group-item list-group-item-action" (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
+    <li *ngFor="let room of getRoomListUI()" class="room list-group-item list-group-item-action"
+      (mouseenter)="room.hovered = true" (mouseleave)="room.hovered = false">
       <div class="d-flex justify-content-between">
         <small class="sub-text" [ngClass]="{'hovered' : room?.hovered === true, 'joined': room?.joined === true }">
           <!-- <span *ngIf="!room.peer.includes(this.identity)">{{room.status}}</span>
@@ -74,20 +75,19 @@
       </small> -->
       <div class="btn-group">
         <div class="text-center">
-          <button *ngIf="room.status === 'connected' && muted === false" class="btn btn-primary mute" (click)="mute()">Mute</button>
-          <button *ngIf="room.status === 'connected' && muted === true" class="btn btn-primary unmute" (click)="unmute()">Unmute</button>
+          <button *ngIf="room.status === 'connected' && muted === false" class="btn btn-primary mute"
+            (click)="mute()">Mute</button>
+          <button *ngIf="room.status === 'connected' && muted === true" class="btn btn-primary unmute"
+            (click)="unmute()">Unmute</button>
         </div>
 
-        <button
-          class="join btn"
-          [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
-          *ngIf="currentRoomName !== room?.name && room.status !== 'connected'"
-          (click)="onClickOnRoom(room)"
-        >
+        <button class="join btn" [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
+          *ngIf="currentRoomName !== room?.name && room.status !== 'connected'" (click)="onClickOnRoom(room)">
           {{ room && room.peer && room.peer.length >= 2 ? 'Join' : 'Talk' }}
         </button>
         <button class="leave btn" *ngIf="room.status === 'connected'" (click)="leaveRoom()">Leave</button>
-        <span class="connecting-status" *ngIf="selectedRoom?.name === room?.name && status === 'connecting'">Connecting...</span>
+        <span class="connecting-status"
+          *ngIf="selectedRoom?.name === room?.name && status === 'connecting'">Connecting...</span>
       </div>
     </li>
   </ul>
@@ -104,7 +104,7 @@
       <button (click)="initIdentity('Ty3')">Ty3</button>
 <button (click)="check()">check</button> -->
 
-<video id="local-video-container" #streamView width="0" height="0" autoplay>
+<video id="local-video-container" #streamView width="0" height="0" autoplay muted="true" volume=0>
   <source type='video/webm; codecs="opus,vp8"'>
   Your browser does not support HTML5 video.
 </video>
