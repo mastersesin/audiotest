@@ -4,11 +4,12 @@ import { AuthGuard } from './auth/auth.guard';
 import { HomeComponent } from './home/home.component';
 import { LoginComponent } from './login/login.component';
 import { RoomComponent } from './room/room.component';
+import { MergeMultiComponent } from './ty/merge-multi.component';
 
 const routes: Routes = [
-  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
+  { path: '', component: MergeMultiComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'room', component: RoomComponent, canActivate: [AuthGuard] },
+  { path: 'room', component: MergeMultiComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'login' },
 ];
 

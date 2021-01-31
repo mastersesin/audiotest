@@ -14,6 +14,7 @@ import { AppRoutingModule } from './router.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { environment } from 'src/environments/environment';
+import { MergeMultiComponent } from './ty/merge-multi.component';
 
 const config: SocketIoConfig = {
   url: environment.backendUrl, options: {
@@ -30,7 +31,8 @@ const config: SocketIoConfig = {
     WebrtclearnComponent,
     LoginComponent,
     RoomComponent,
-    HomeComponent
+    HomeComponent,
+    MergeMultiComponent
   ],
   imports: [
     BrowserModule,
