@@ -117,110 +117,27 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   constructor(private socket: Socket,
     private authService: AuthService, private roomService: RoomService) {
-    console.log('update at 2021-01-30 22-53');
-    const leaveRoomCheckerSubscription = this.leaveRoomChecker.subscribe(() => {
-      const checker = this.status === 'connected' && this.selectedRoom?.peer?.length === 1;
-      console.log(this.status, this.selectedRoom?.peer);
-      if (checker) {
-        this.leaveRoom();
-      }
-    });
-    this.subscription.add(leaveRoomCheckerSubscription);
+    // fix bug - reload on room change
+    // console.log('update at 2021-01-30 22-53');
+    // const leaveRoomCheckerSubscription = this.leaveRoomChecker.subscribe(() => {
+    //   const checker = this.status === 'connected' && this.selectedRoom?.peer?.length === 1;
+    //   console.log(this.status, this.selectedRoom?.peer);
+    //   if (checker === true) {
+    //     // this.leaveRoom();
+    //   }
+    // });
+    // this.subscription.add(leaveRoomCheckerSubscription);
     this.askForMicrophonePermission();
   }
 
   ngOnDestroy() {
-    this.leaveRoomChecker.complete();
+    // this.leaveRoomChecker.complete();
     this.subscription.unsubscribe();
   }
 
   connect() {
     const email = this.authService.getProfile().email;
     this.initIdentity(email);
-  }
-
-  private displayName(name: string) {
-    if (name) {
-      const isEmail = name.includes('@');
-      if (isEmail) {
-        const username = name.split('@')[0];
-        return username;
-      }
-    }
-    return '';
-  }
-
-  public getPeerName(p: string) {
-    if (p.includes('@')) {
-      return p.split('@')[0];
-    }
-    return p;
-  }
-
-  public showPeers(peers: string | string[]) {
-    // console.log(peers);
-    if (typeof peers == 'object') {
-      const usernames = peers.map(this.getPeerName);
-      return usernames.join(', ');
-    }
-    return peers;
-  }
-
-  xxx(latestPeerList: Array<string>) {
-    // console.log('xxx input', latestPeerList);
-    let diff: any[] = [];
-    // loop through the local peer connection list to find the identity of removed user
-    for (let currentPeerItem of this.peerConnList) {
-      // console.log('current room ', this.currentRoomName);
-      // console.log('current Peer Item ', currentPeerItem);
-      // console.log('latest peer list', latestPeerList);
-      const currentUser = (currentPeerItem.remote_user as string);
-      const check = latestPeerList.includes(currentUser);
-      if (!check) {
-        currentPeerItem.peerObj.close();
-        // currentPeerItem.peerObj.removeTrack();
-        // currentPeerItem.peerObj.removeStream();
-        console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
-        console.log('Close');
-        diff.push(currentPeerItem);
-      } else {
-        console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
-      }
-    }
-    return diff;
-  }
-
-  private enableMicrophone(value: boolean) {
-    this.peerConnList.forEach((peerConnItem) => {
-      const audioTracks = peerConnItem.remoteStream?.getAudioTracks();
-      audioTracks?.forEach((audioTrack) => {
-        audioTrack.enabled = value;
-      });
-    });
-    this.userMedia().then((mediaStream) => {
-      mediaStream.getAudioTracks().forEach((audioTrack) => {
-        // audioTrack.enabled = value;
-      });
-    });
-  }
-
-  muted = false;
-  mute() {
-    this.muted = true;
-    this.enableMicrophone(false);
-  }
-
-  unmute() {
-    this.muted = false;
-    this.enableMicrophone(true);
-  }
-
-  ngOnInit(): void {
-    // FOR DEV, REMOVE FOR PROD
-    (window as any).room = this;
-
-    this.connect();
-
     this.socket.on('icecandidatechannel', (response: any) => {
       console.log(response);
       if (response.send_to === this.identity) {
@@ -235,7 +152,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     this.socket.on('listallroom1', (response: RoomObject[]) => {
       console.log(response);
-      this.leaveRoomChecker.next();
+      // this.leaveRoomChecker.next();
       this.roomService.removeAllRooms();
 
       /**
@@ -249,6 +166,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       response.forEach(room => {
         const key = Object.keys(room)[0];
         const values = Object.keys(room).map(key1 => room[key1]);
+        // console.log('list room ', room);
         const thisRoom = {
           room_name: key,
           peer: values[0],
@@ -270,7 +188,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           id: new Date().getTime().toString(),
           name: thisRoom.room_name,
           peer: thisRoom.peer,
-          status: thisRoom.status,
+          // fix bug - status is always disconnected
+          status: thisRoom.room_name === this.currentRoomName ? this.status : thisRoom.status,
           displayName: this.displayName(thisRoom.room_name),
           peerString: (thisRoom.peer as string[]).join(', ')
         });
@@ -374,6 +293,91 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
   }
 
+  private displayName(name: string) {
+    if (name) {
+      const isEmail = name.includes('@');
+      if (isEmail) {
+        const username = name.split('@')[0];
+        return username;
+      }
+    }
+    return '';
+  }
+
+  public getPeerName(p: string) {
+    if (p.includes('@')) {
+      return p.split('@')[0];
+    }
+    return p;
+  }
+
+  public showPeers(peers: string | string[]) {
+    // console.log(peers);
+    if (typeof peers == 'object') {
+      const usernames = peers.map(this.getPeerName);
+      return usernames.join(', ');
+    }
+    return peers;
+  }
+
+  xxx(latestPeerList: Array<string>) {
+    // console.log('xxx input', latestPeerList);
+    let diff: any[] = [];
+    // loop through the local peer connection list to find the identity of removed user
+    for (let currentPeerItem of this.peerConnList) {
+      // console.log('current room ', this.currentRoomName);
+      // console.log('current Peer Item ', currentPeerItem);
+      // console.log('latest peer list', latestPeerList);
+      const currentUser = (currentPeerItem.remote_user as string);
+      const check = latestPeerList.includes(currentUser);
+      if (!check) {
+        currentPeerItem.peerObj.close();
+        // currentPeerItem.peerObj.removeTrack();
+        // currentPeerItem.peerObj.removeStream();
+        console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
+        console.log('Close');
+        diff.push(currentPeerItem);
+      } else {
+        console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
+      }
+    }
+    return diff;
+  }
+
+  // add mute/unmute - start
+  private enableMicrophone(value: boolean) {
+    this.peerConnList.forEach((peerConnItem) => {
+      const audioTracks = peerConnItem.remoteStream?.getAudioTracks();
+      audioTracks?.forEach((audioTrack) => {
+        audioTrack.enabled = value;
+      });
+    });
+    this.userMedia().then((mediaStream) => {
+      mediaStream.getAudioTracks().forEach((audioTrack) => {
+        // audioTrack.enabled = value;
+      });
+    });
+  }
+
+  muted = false;
+  mute() {
+    this.muted = true;
+    this.enableMicrophone(false);
+  }
+
+  unmute() {
+    this.muted = false;
+    this.enableMicrophone(true);
+  }
+  // add mute/unmute - end
+
+  ngOnInit(): void {
+    // FOR DEV, REMOVE FOR PROD
+    (window as any).room = this;
+
+    this.connect();
+  }
+
   showLeaveRoomButton() {
     if (this.identity && this.currentRoomName && this.status === 'connected') {
       return true;
@@ -390,8 +394,16 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   leaveRoom(roomName = this.currentRoomName) {
+    console.log('leave room', this.currentRoomName);
     this.sendLeaveRequest(roomName);
     this.status = 'disconnect';
+    //  add leave room handler
+    this.peerConnList.forEach((peerConnItem) => {
+      peerConnItem.peerObj.close();
+    });
+    this.peerConnList = [];
+    console.log('Reconnect after leave.');
+    this.connect();
     // window.location.reload();
   }
 
