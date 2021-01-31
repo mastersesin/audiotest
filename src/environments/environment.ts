@@ -16,9 +16,9 @@ export const environment = {
       },
       {
         urls: 'stun:35.214.95.239:1609',
-      },
+      }
     ]
-  },
+  }
   // mediaServerConfiguration: {
   //   iceServers: [
   //     {

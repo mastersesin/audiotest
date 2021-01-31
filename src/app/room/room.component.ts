@@ -36,7 +36,20 @@ export class RoomComponent implements OnInit, OnDestroy {
   toggle = false;
   currentRoomName: any = null;
 
-  configuration = environment.mediaServerConfiguration;
+  // configuration = environment.mediaServerConfiguration;
+
+  configuration = {
+    iceServers: [
+      {
+        urls: 'turn:35.214.95.239:1609?transport=udp',
+        username: 'Ty1',
+        credential: 'password'
+      },
+      {
+        urls: 'stun:35.214.95.239:1609',
+      }
+    ]
+  }
 
   get selectedRoom() {
     return this.roomService.getCurrentRoom();
@@ -151,11 +164,11 @@ export class RoomComponent implements OnInit, OnDestroy {
         currentPeerItem.peerObj.close();
         // currentPeerItem.peerObj.removeTrack();
         // currentPeerItem.peerObj.removeStream();
-        // console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
+        console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
         console.log('Close');
         diff.push(currentPeerItem);
       } else {
-        // console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
+        console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
       }
     }
     return diff;
