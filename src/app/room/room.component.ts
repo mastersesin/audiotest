@@ -69,13 +69,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     return this.roomService.getRoomList();
   }
 
-  getRoomListUI() {
-    const list = this.roomService.getRoomList()
-      // .filter((room) => room.peer[0] !== this.identity)
-      .sort((a, b) => b.peer.length - a.peer.length);
-    (window as any).roomListUI = list;
-    return list;
-  }
+  // getRoomListUI() {
+  //   const list = this.roomService.getRoomList()
+  //     .filter((room) => room.peer[0] !== this.identity)
+  //     .sort((a, b) => b.peer.length - a.peer.length);
+  //   (window as any).roomListUI = list;
+  //   return list;
+  // }
 
   onClickOnRoom(room: IRoom) {
     const check = this.identity !== null && !room.peer.includes(this.identity);
