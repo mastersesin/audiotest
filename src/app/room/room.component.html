@@ -74,7 +74,7 @@
         {{ showRoomTips(room)}}
       </small> -->
       <div class="btn-group">
-        <div class="text-center">
+        <div class="text-center" style="display: none">
           <button *ngIf="room.status === 'connected' && muted === false" class="btn btn-primary mute"
             (click)="mute()">Mute</button>
           <button *ngIf="room.status === 'connected' && muted === true" class="btn btn-primary unmute"

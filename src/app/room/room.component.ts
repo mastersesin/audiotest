@@ -356,7 +356,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     this.userMedia().then((mediaStream) => {
       mediaStream.getAudioTracks().forEach((audioTrack) => {
-        // audioTrack.enabled = value;
+        audioTrack.enabled = value;
       });
     });
   }

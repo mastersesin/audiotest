@@ -4,9 +4,9 @@
     <div class="mb-3">
       <label for="email" class="form-label">Email address</label>
       <input formControlName="email" type="email" class="form-control"
-        [ngClass]="{ 'is-invalid': hasEmailError(), 'is-valid': !hasEmailError() }" id="email">
+        [ngClass]="{ 'is-invalid': hasEmailError(), 'is-valid': validEmail() }" id="email">
       <div *ngIf="hasEmailError()" class="invalid-feedback">{{ getEmailErrorMsg() }}</div>
-      <div *ngIf="!hasEmailError()" class="valid-feedback">Valid Email!</div>
+      <div *ngIf="validEmail()" class="valid-feedback">Valid Email!</div>
     </div>
     <button [disabled]="isDisabled()" type="submit" class="btn btn-primary">Login</button>
   </form>

@@ -32,6 +32,10 @@ export class LoginComponent implements OnInit {
     return this.form.controls.email.invalid;
   }
 
+  validEmail() {
+    return this.form.controls.email.valid;
+  }
+
   getEmailErrorMsg() {
     const errors = this.form.controls.email.errors;
     // console.log(errors);
@@ -48,7 +52,7 @@ export class LoginComponent implements OnInit {
   }
 
   isDisabled() {
-    return !this.form.valid;
+    return this.form.invalid;
   }
 
 }
