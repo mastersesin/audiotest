@@ -6,21 +6,35 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
 import { IRoom, RoomService } from '../services/room.service';
 
-class WindowJam {
+class JamAudio {
   localStream: MediaStream;
+  remoteStream: MediaStream;
+  sender: RTCRtpSender | undefined;
+  localTrack: MediaStreamTrack | undefined;
   constructor() {
     this.localStream = new MediaStream();
+    this.remoteStream = new MediaStream();
+    this.sender = undefined;
+    this.localTrack = undefined;
   }
 
   mute() {
-    const audioTracks = this.localStream.getAudioTracks();
+    this.sender && this.sender.replaceTrack(null);
+  }
+
+  unmute() {
+    this.sender && this.localTrack && this.sender.replaceTrack(this.localTrack);
+  }
+
+  away() {
+    const audioTracks = this.remoteStream.getAudioTracks();
     audioTracks.forEach((track) => {
       track.enabled = false;
     });
   }
 
-  unmute() {
-    const audioTracks = this.localStream.getAudioTracks();
+  back() {
+    const audioTracks = this.remoteStream.getAudioTracks();
     audioTracks.forEach((track) => {
       track.enabled = true;
     });
@@ -28,10 +42,13 @@ class WindowJam {
 
   reset() {
     this.localStream = new MediaStream();
+    this.remoteStream = new MediaStream();
+    this.sender = undefined;
+    this.localTrack = undefined;
   }
 }
-(window as any).jam = new WindowJam();
-function windowJam(): WindowJam {
+(window as any).jam = new JamAudio();
+function jamAudio(): JamAudio {
   return (window as any).jam;
 }
 
@@ -52,7 +69,7 @@ type RoomStatus = 'connected' | 'connecting' | 'disconnect';
   templateUrl: './room.component.html',
   styleUrls: ['./room.component.scss']
 })
-export class RoomComponent implements OnInit, OnDestroy {
+export class RoomComponent implements OnInit {
 
   @ViewChild('streamView') streamView: ElementRef | undefined;
   @ViewChild('theirStreamView') theirStreamView: ElementRef | undefined;
@@ -78,13 +95,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   showRoomTips(room: IRoom) {
-    // if (room?.hovered === true && this.selectedRoom?.id !== room?.id) {
-    //   return '(Click to join)';
-    // }
     if (this.selectedRoom?.id === room?.id || this.selectedRoom?.status === 'connected') {
       return 'Joined!';
     }
-    // return 'Click to join...';
     return '';
   }
 
@@ -130,27 +143,13 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   public leaveRoomChecker = new Subject();
-  subscription = new Subscription();
 
   constructor(private socket: Socket,
     private authService: AuthService, private roomService: RoomService) {
-    // fix bug - reload on room change
-    // console.log('update at 2021-01-30 22-53');
-    // const leaveRoomCheckerSubscription = this.leaveRoomChecker.subscribe(() => {
-    //   const checker = this.status === 'connected' && this.selectedRoom?.peer?.length === 1;
-    //   console.log(this.status, this.selectedRoom?.peer);
-    //   if (checker === true) {
-    //     // this.leaveRoom();
-    //   }
-    // });
-    // this.subscription.add(leaveRoomCheckerSubscription);
     this.askForMicrophonePermission();
   }
 
-  ngOnDestroy() {
-    // this.leaveRoomChecker.complete();
-    this.subscription.unsubscribe();
-  }
+
 
   connect() {
     const email = this.authService.getProfile().email;
@@ -162,6 +161,13 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.peerConnList.forEach((peerObj: any) => {
           if (peerObj.remote_user === response.send_from) {
             const rtcPeerConn = peerObj.peerObj;
+            (rtcPeerConn as RTCPeerConnection).getSenders().forEach((sender) => {
+              if (sender.track !== null) {
+                console.log('set local track = sender track');
+                jamAudio().localTrack = sender.track;
+                jamAudio().sender = sender;
+              }
+            })
             rtcPeerConn.addIceCandidate(new RTCIceCandidate(response.candidate));
           }
         });
@@ -270,7 +276,7 @@ export class RoomComponent implements OnInit, OnDestroy {
               });
               if (this.streamView) {
                 this.streamView.nativeElement.srcObject = localStream;
-                windowJam().localStream = localStream;
+                jamAudio().localStream = localStream;
               }
               console.log('End getting stream');
               console.log('negotiationneeded should trigger now');
@@ -296,7 +302,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
           if (this.streamView) {
             this.streamView.nativeElement.srcObject = localStream;
-            windowJam().localStream = localStream;
+            jamAudio().localStream = localStream;
           }
           rtcPeerConnAnswer.createOffer().then(a => {
             this.peerConnList.push({ peerObj: rtcPeerConnAnswer, remote_user: response.args.from_user });
@@ -392,19 +398,23 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   muted = false;
   mute() {
+    console.log('mute');
     this.muted = true;
-    windowJam().mute();
+    jamAudio().mute();
   }
 
   unmute() {
+    console.log('unmute');
     this.muted = false;
-    windowJam().unmute();
+    jamAudio().unmute();
   }
   // add mute/unmute - end
 
   ngOnInit(): void {
     // FOR DEV, REMOVE FOR PROD
-    (window as any).room = this;
+    if (!environment.production) {
+      (window as any).room = this;
+    }
 
     this.connect();
   }
@@ -478,9 +488,6 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   joinAudioRoom(roomName: string, currentRoomName: string): void {
 
-    // this.peerConnList.forEach(conn => {
-    //   conn.remoteStream = null;
-    // });
     this.peerConnList = [];
     this.status = 'connecting';
     this.socket.emit('room', {
@@ -495,15 +502,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.currentRoomName = roomName;
 
     console.log(this.currentRoomName);
-
-    // this.socket.emit('room', {
-    //   command: 'checkroom',
-    //   args: {
-    //     room_name: 'default'
-    //   }
-    // });
-
-    // And when we receiving ice candidate from remote when setup last piece
   }
 
   initIdentity(identity: any): void {
@@ -587,7 +585,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           peerObj.remoteStream = remoteStreamObj;
         }
       });
-      windowJam().localStream = remoteStreamObj;
+      jamAudio().remoteStream = remoteStreamObj;
     });
 
     rtcPeerConn.addEventListener('connectionstatechange', event => {
