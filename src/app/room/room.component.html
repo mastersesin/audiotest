@@ -60,8 +60,8 @@
           <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
             {{room.status}}</span> -->
           <!-- {{room.status}} -->
-          <span *ngIf="room.status === 'connected'" class="red-oval"></span>
-          <span *ngIf="room.status !== 'connected'" class="green-oval"></span>
+          <span *ngIf="showRedOval(room)" class="red-oval"></span>
+          <span *ngIf="showGreenOval(room)" class="green-oval"></span>
         </small>
       </div>
       <!-- <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>
@@ -75,7 +75,7 @@
         {{ showRoomTips(room)}}
       </small> -->
       <div class="btn-group">
-        <div class="text-center" style="display: none">
+        <div class="text-center" style="visibility: hidden;">
           <button *ngIf="room.status === 'connected' && muted === false" class="btn btn-primary mute"
             (click)="mute()">Mute</button>
           <button *ngIf="room.status === 'connected' && muted === true" class="btn btn-primary unmute"

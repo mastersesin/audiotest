@@ -346,6 +346,13 @@ export class RoomComponent implements OnInit, OnDestroy {
     return diff;
   }
 
+  showGreenOval(room: IRoom) {
+    return room.status !== 'connected' && room?.peer?.length > 1;
+  }
+  showRedOval(room: IRoom) {
+    return room.status === 'connected';
+  }
+
   // add mute/unmute - start
   private enableMicrophone(value: boolean) {
     this.peerConnList.forEach((peerConnItem) => {
