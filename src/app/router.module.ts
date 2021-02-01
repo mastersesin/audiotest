@@ -7,9 +7,9 @@ import { RoomComponent } from './room/room.component';
 import { MergeMultiComponent } from './ty/merge-multi.component';
 
 const routes: Routes = [
-  { path: '', component: MergeMultiComponent, canActivate: [AuthGuard] },
+  { path: '', component: HomeComponent, canActivate: [AuthGuard] },
   { path: 'login', component: LoginComponent },
-  { path: 'room', component: MergeMultiComponent, canActivate: [AuthGuard] },
+  { path: 'room', component: RoomComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: 'login' },
 ];
 
