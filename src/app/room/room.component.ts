@@ -147,9 +147,9 @@ export class RoomComponent implements OnInit, OnDestroy {
        * If a new list rooms dont have room name that stored in `this.currentRoomName`
        * we need to leave that room named `currentRoomName`
        */
-      // if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] == this.currentRoomName)) {
-      //   this.leaveRoom();
-      // }
+      if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] == this.currentRoomName)) {
+        this.leaveRoom();
+      }
 
       response.forEach(room => {
         const key = Object.keys(room)[0];
@@ -160,12 +160,16 @@ export class RoomComponent implements OnInit, OnDestroy {
           peer: values[0],
           status: 'disconnect'
         } as any;
-        const check1 = room.room_name === this.currentRoomName;
+        const check1 = thisRoom.room_name === this.currentRoomName;
+        console.log('Check if the current room is existed ', room.room_name, this.currentRoomName);
         if (check1) {
+          console.log('Current Room is existed. ');
           const check2 = this.xxx(thisRoom.peer);
-          // console.log('check 2 ', check2);
+          console.log('There is unused connections, close & remove them ', check2);
           if (check2.length > 0) {
             check2.forEach((removeConn) => {
+              removeConn.peerObj.close();
+              console.log('Remove connection', removeConn);
               this.peerConnList = this.peerConnList.filter((peerConnItem) => peerConnItem.remote_user !== removeConn.remote_user);
             });
           }
@@ -185,9 +189,9 @@ export class RoomComponent implements OnInit, OnDestroy {
       // when the current connected room only has the current user as the last user, leave the room
       const currentRoom = this.roomService.getRoomList().find((r) => r.name === this.currentRoomName);
       if (currentRoom) {
-        console.log('current Room', currentRoom);
+        // console.log('current Room', currentRoom);
         this.roomService.setCurrentRoom(currentRoom);
-        console.log('current room ', this.selectedRoom);
+        // console.log('current room ', this.selectedRoom);
         if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName && this.selectedRoom?.peer.length === 1) {
           console.log('leave room when status is connected && current room name === currentRoomName && the number of users in the room is 1');
           this.leaveRoom();
@@ -319,9 +323,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     return peers;
   }
 
-  xxx(latestPeerList: Array<string>) {
+  xxx(latestPeerList: Array<string>): IConnection[] {
     // console.log('xxx input', latestPeerList);
-    let diff: any[] = [];
+    let diff: IConnection[] = [];
+    console.log('check xxx ', this.peerConnList);
     // loop through the local peer connection list to find the identity of removed user
     for (let currentPeerItem of this.peerConnList) {
       // console.log('current room ', this.currentRoomName);
@@ -329,12 +334,9 @@ export class RoomComponent implements OnInit, OnDestroy {
       // console.log('latest peer list', latestPeerList);
       const currentUser = (currentPeerItem.remote_user as string);
       const check = latestPeerList.includes(currentUser);
+      console.log('Check if the current user is in the latest peer list ', check, latestPeerList, currentPeerItem);
       if (!check) {
-        currentPeerItem.peerObj.close();
-        // currentPeerItem.peerObj.removeTrack();
-        // currentPeerItem.peerObj.removeStream();
         console.log(`User ${currentUser} is not existed in the current peer`, currentPeerItem);
-        console.log('Close');
         diff.push(currentPeerItem);
       } else {
         console.log(`User ${currentUser} is existed in the current peer`, currentPeerItem);
@@ -458,6 +460,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         current_room_name: currentRoomName
       }
     });
+    console.log('join room ', roomName, currentRoomName);
     this.currentRoomName = roomName;
 
     console.log(this.currentRoomName);
