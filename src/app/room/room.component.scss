@@ -23,7 +23,8 @@
 
     .btn-group {
       display: flex;
-      justify-content: space-between;
+      // justify-content: space-between;
+      justify-content: flex-end;
       button {
         background-color: transparent;
         color: green;
@@ -57,6 +58,9 @@
         }
 
         &.leave {
+          &:hover {
+            border: solid 1px red;
+          }
           color: red;
           border: none;
           font-weight: initial;
