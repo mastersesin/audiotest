@@ -6,6 +6,35 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
 import { IRoom, RoomService } from '../services/room.service';
 
+class WindowJam {
+  localStream: MediaStream;
+  constructor() {
+    this.localStream = new MediaStream();
+  }
+
+  mute() {
+    const audioTracks = this.localStream.getAudioTracks();
+    audioTracks.forEach((track) => {
+      track.enabled = false;
+    });
+  }
+
+  unmute() {
+    const audioTracks = this.localStream.getAudioTracks();
+    audioTracks.forEach((track) => {
+      track.enabled = true;
+    });
+  }
+
+  reset() {
+    this.localStream = new MediaStream();
+  }
+}
+(window as any).jam = new WindowJam();
+function windowJam(): WindowJam {
+  return (window as any).jam;
+}
+
 export interface RoomObject {
   [key: string]: string[];
 }
@@ -239,7 +268,10 @@ export class RoomComponent implements OnInit, OnDestroy {
                   localStream.addTrack(track);
                 }
               });
-              this.streamView && (this.streamView.nativeElement.srcObject = localStream);
+              if (this.streamView) {
+                this.streamView.nativeElement.srcObject = localStream;
+                windowJam().localStream = localStream;
+              }
               console.log('End getting stream');
               console.log('negotiationneeded should trigger now');
             });
@@ -262,7 +294,10 @@ export class RoomComponent implements OnInit, OnDestroy {
               localStream.addTrack(track);
             }
           });
-          this.streamView && (this.streamView.nativeElement.srcObject = localStream);
+          if (this.streamView) {
+            this.streamView.nativeElement.srcObject = localStream;
+            windowJam().localStream = localStream;
+          }
           rtcPeerConnAnswer.createOffer().then(a => {
             this.peerConnList.push({ peerObj: rtcPeerConnAnswer, remote_user: response.args.from_user });
             this.initMandatoryEventListener(rtcPeerConnAnswer, response.args.from_user, true);
@@ -354,29 +389,16 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   // add mute/unmute - start
-  private enableMicrophone(value: boolean) {
-    this.peerConnList.forEach((peerConnItem) => {
-      const audioTracks = peerConnItem.remoteStream?.getAudioTracks();
-      audioTracks?.forEach((audioTrack) => {
-        audioTrack.enabled = value;
-      });
-    });
-    this.userMedia().then((mediaStream) => {
-      mediaStream.getAudioTracks().forEach((audioTrack) => {
-        audioTrack.enabled = value;
-      });
-    });
-  }
 
   muted = false;
   mute() {
     this.muted = true;
-    this.enableMicrophone(false);
+    windowJam().mute();
   }
 
   unmute() {
     this.muted = false;
-    this.enableMicrophone(true);
+    windowJam().unmute();
   }
   // add mute/unmute - end
 
@@ -434,6 +456,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   onAnswerReceive(rtcPeerConn: RTCPeerConnection, answer: any): void {
     console.log('Start processing answer');
     const sessionDesc = new RTCSessionDescription(answer);
+    console.log('set remote description ', sessionDesc);
     rtcPeerConn.setRemoteDescription(sessionDesc);
     console.log('setRemoteDesc done');
   }
@@ -564,6 +587,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           peerObj.remoteStream = remoteStreamObj;
         }
       });
+      windowJam().localStream = remoteStreamObj;
     });
 
     rtcPeerConn.addEventListener('connectionstatechange', event => {
