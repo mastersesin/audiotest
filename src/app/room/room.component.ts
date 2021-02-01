@@ -165,9 +165,9 @@ export class RoomComponent implements OnInit, OnDestroy {
         console.log('Check if the current room is existed ', thisRoom.room_name, this.currentRoomName);
         if (check1) {
           console.log('Current Room is existed. ');
-          const check2 = this.xxx(thisRoom.peer);
-          console.log('There is unused connections, close & remove them ', check2);
+          const check2 = this.checkForUnusedConnection(thisRoom.peer);
           if (check2.length > 0) {
+            console.log('There are unused connections, close & remove them ', check2);
             check2.forEach((removeConn) => {
               removeConn.peerObj.close();
               console.log('Remove connection', removeConn);
@@ -189,14 +189,17 @@ export class RoomComponent implements OnInit, OnDestroy {
 
       // when the current connected room only has the current user as the last user, leave the room
       const currentRoom = this.roomService.getRoomList().find((r) => r.name === this.currentRoomName);
-      console.log('current Room', currentRoom);
+      console.log('Latest Current Room', currentRoom);
       if (currentRoom) {
+        console.log('Set latest current room to local state.');
         this.roomService.setCurrentRoom(currentRoom);
-        console.log('current room ', this.selectedRoom);
-        console.log(this.status, this.selectedRoom, this.currentRoomName, this.selectedRoom?.peer);
+        console.log('Check Local Current Room ', this.selectedRoom);
+        console.log('Check for leave room, ', this.status, this.selectedRoom, this.currentRoomName, this.selectedRoom?.peer);
         if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName && this.selectedRoom?.peer.length === 1) {
           console.log('leave room when status is connected && current room name === currentRoomName && the number of users in the room is 1');
           this.leaveRoom();
+        } else {
+          console.log('No need to execute leave room');
         }
       }
 
@@ -325,15 +328,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     return peers;
   }
 
-  xxx(latestPeerList: Array<string>): IConnection[] {
-    // console.log('xxx input', latestPeerList);
+  checkForUnusedConnection(latestPeerList: Array<string>): IConnection[] {
     let diff: IConnection[] = [];
-    console.log('check xxx ', this.peerConnList);
+    console.log('Current connection list. ', this.peerConnList);
     // loop through the local peer connection list to find the identity of removed user
     for (let currentPeerItem of this.peerConnList) {
-      // console.log('current room ', this.currentRoomName);
-      // console.log('current Peer Item ', currentPeerItem);
-      // console.log('latest peer list', latestPeerList);
       const currentUser = (currentPeerItem.remote_user as string);
       const check = latestPeerList.includes(currentUser);
       console.log('Check if the current user is in the latest peer list ', check, latestPeerList, currentPeerItem);
