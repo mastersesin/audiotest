@@ -147,9 +147,10 @@ export class RoomComponent implements OnInit, OnDestroy {
        * If a new list rooms dont have room name that stored in `this.currentRoomName`
        * we need to leave that room named `currentRoomName`
        */
-      if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] == this.currentRoomName)) {
-        this.leaveRoom();
-      }
+      // remove this, because on a room of two people, if one person leaves, then he/she can not rejoin
+      // if (this.status === 'connected' && !response.find((room) => Object.keys(room)[0] == this.currentRoomName)) {
+      //   this.leaveRoom();
+      // }
 
       response.forEach(room => {
         const key = Object.keys(room)[0];
@@ -188,10 +189,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
       // when the current connected room only has the current user as the last user, leave the room
       const currentRoom = this.roomService.getRoomList().find((r) => r.name === this.currentRoomName);
+      console.log('current Room', currentRoom);
       if (currentRoom) {
-        // console.log('current Room', currentRoom);
         this.roomService.setCurrentRoom(currentRoom);
-        // console.log('current room ', this.selectedRoom);
+        console.log('current room ', this.selectedRoom);
+        console.log(this.status, this.selectedRoom, this.currentRoomName, this.selectedRoom?.peer);
         if (this.status === 'connected' && this.selectedRoom?.name === this.currentRoomName && this.selectedRoom?.peer.length === 1) {
           console.log('leave room when status is connected && current room name === currentRoomName && the number of users in the room is 1');
           this.leaveRoom();
