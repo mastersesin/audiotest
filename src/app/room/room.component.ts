@@ -161,7 +161,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           status: 'disconnect'
         } as any;
         const check1 = thisRoom.room_name === this.currentRoomName;
-        console.log('Check if the current room is existed ', room.room_name, this.currentRoomName);
+        console.log('Check if the current room is existed ', thisRoom.room_name, this.currentRoomName);
         if (check1) {
           console.log('Current Room is existed. ');
           const check2 = this.xxx(thisRoom.peer);
