@@ -60,7 +60,8 @@
           <span *ngIf="room.peer.includes(this.identity) && room.status === 'connected'">
             {{room.status}}</span> -->
           <!-- {{room.status}} -->
-          <span *ngIf="room.status === 'connected'" class="green-oval"></span>
+          <span *ngIf="room.status === 'connected'" class="red-oval"></span>
+          <span *ngIf="room.status !== 'connected'" class="green-oval"></span>
         </small>
       </div>
       <!-- <p *ngIf="room.peer?.length" class="mb-1 peer">{{showPeers(room.peer)}}</p>

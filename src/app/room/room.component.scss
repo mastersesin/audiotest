@@ -52,7 +52,7 @@
             padding-left: 20px;
             padding-right: 20px;
             font-weight: bold;
-            border-color:green;
+            border-color: green;
           }
         }
 
@@ -112,6 +112,17 @@
   background-color: green;
   width: 10px;
   border: 1px solid green;
+  position: absolute;
+  height: 10px;
+  border-radius: 50%;
+  right: 18px;
+  top: 10px;
+}
+
+.red-oval {
+  background-color: red;
+  width: 10px;
+  border: 1px solid red;
   position: absolute;
   height: 10px;
   border-radius: 50%;
