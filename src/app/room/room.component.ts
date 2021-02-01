@@ -42,19 +42,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   toggle = false;
   currentRoomName: any = null;
 
-  // configuration = environment.mediaServerConfiguration;
-  configuration = {
-    iceServers: [
-      {
-        urls: 'turn:35.241.95.239:1609?transport=udp',
-        username: 'Ty1',
-        credential: 'password'
-      },
-      {
-        urls: 'stun:35.241.95.239:1609',
-      }
-    ]
-  };
+  configuration = environment.mediaServerConfiguration;
 
   get selectedRoom() {
     return this.roomService.getCurrentRoom();
