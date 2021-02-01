@@ -82,6 +82,13 @@
             (click)="unmute()">Unmute</button>
         </div>
 
+        <div class="text-center" style="visibility: hidden">
+          <button *ngIf="room.status === 'connected' && available === true" class="btn btn-primary mute"
+            (click)="busy()">Away</button>
+          <button *ngIf="room.status === 'connected' && available === false" class="btn btn-primary unmute"
+            (click)="online()">Back</button>
+        </div>
+
         <button class="join btn" [ngClass]="{ 'join-group': room && room.peer && room.peer.length >= 2 }"
           *ngIf="currentRoomName !== room?.name && room.status !== 'connected'" (click)="onClickOnRoom(room)">
           {{ room && room.peer && room.peer.length >= 2 ? 'Join' : 'Talk' }}

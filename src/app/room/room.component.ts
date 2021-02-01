@@ -1,6 +1,6 @@
 import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { v4 as uuidv4 } from 'uuid';
 import { AuthService } from '../auth/auth.service';
@@ -407,6 +407,18 @@ export class RoomComponent implements OnInit {
     console.log('unmute');
     this.muted = false;
     jamAudio().unmute();
+  }
+  available = true;
+  busy() {
+    console.log('busy');
+    this.available = false;
+    jamAudio().away();
+  }
+
+  online() {
+    console.log('online');
+    this.available = true;
+    jamAudio().back();
   }
   // add mute/unmute - end
 
